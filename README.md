@@ -43,34 +43,7 @@ Install environment variable support:
 npm install dotenv
 
 
-CV_project/
-│
-├── server.js           ← Starting point. Boots the server & creates the DB table on first run.
-│
-├── .env                ← Your DB credentials (host, port, user, password).
-│
-└── src/
-    │
-    ├── app.js          ← Glues everything together: registers middleware & routes.
-    │
-    ├── db/
-    │   └── index.js    ← Opens & exports the PostgreSQL connection pool.
-    │                     All DB queries use this single shared connection.
-    │
-    ├── routes/
-    │   └── cvRoutes.js ← Defines URL paths (GET /api/cvs, POST /api/cvs, etc.)
-    │                     and maps each one to a controller function.
-    │
-    ├── controllers/
-    │   └── cvController.js ← The actual business logic.
-    │                          Each function handles one action:
-    │                          get all, get one, create, update, delete.
-    │                          Talks to the DB, sends back JSON.
-    │
-    └── public/         ← Static files served directly to the browser.
-        ├── index.html  ← The single UI page (form + CV list).
-        ├── style.css   ← All the styling.
-        └── app.js      ← Frontend JS: calls the REST API and updates the page.
+<img width="718" height="591" alt="image" src="https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a" />
 
 
 create database connection in PGAdmin
