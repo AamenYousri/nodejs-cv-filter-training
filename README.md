@@ -91,23 +91,36 @@ npm install dotenv
 
 
 
-
 ## Training Objectives
 
-During this training, you will implement and practice the following backend concepts:
+During this training, you will learn and practice these backend and frontend concepts:
 
-- **Authentication** – Register users, log in, and manage JWT-based authentication.
-- **Authorization** – Restrict access to resources using role-based permissions.
-- **Database Design** – Create a normalized PostgreSQL schema with proper relationships.
-- **CRUD Operations** – Build REST APIs for creating, reading, updating, and deleting data.
-- **Fuzzy Search** – Implement intelligent candidate search with approximate text matching.
-- **Pagination** – Return large datasets efficiently using page-based results.
-- **Sorting & Filtering** – Allow clients to sort and filter data using query parameters.
-- **Request Validation** – Validate incoming requests before processing them.
-- **Global Error Handling** – Return consistent and meaningful API error responses.
-- **File Uploads** – Upload and store CVs (PDF/DOCX) using multipart requests.
-- **Logging** – Log application events, requests, and errors for debugging.
-- **Environment Variables** – Manage application configuration using `.env` files.
-- **SQL & Database Queries** – Write efficient SQL queries, joins, and transactions without relying on an ORM.
-- **Unit & Integration Testing** – Write automated tests to verify application behavior.
-- **Git Workflow** – Practice branching, pull requests, and writing meaningful commit messages.
+### Backend
+
+- **Authentication** Register and log in users using JWT.
+- **Authorization** Control what different users are allowed to do.
+- **Database Design** Create PostgreSQL tables and relationships.
+- **CRUD Operations** Create, read, update, and delete data.
+- **Fuzzy Search** Search for data even if the text is not an exact match.
+- **Pagination** Split large results into smaller pages.
+- **Sorting & Filtering** Sort and filter data using request parameters.
+- **Request Validation** Check that user input is correct before saving it.
+- **Error Handling** Return clear error messages when something goes wrong.
+- **File Uploads** Upload and store CV files.
+- **Logging** Log requests and errors for troubleshooting.
+- **Environment Variables** Store configuration values in a `.env` file.
+- **SQL Queries** Write SQL queries to work with the database.
+- **Testing** Write unit and integration tests.
+
+### Frontend
+
+- **Routing** Navigate between pages without reloading the application.
+- **UI Components** Build reusable and responsive user interface components.
+- **Forms** Create forms with validation and error messages.
+- **API Integration** Connect the frontend to the backend APIs.
+- **Search & Filters** Build search, filtering, and sorting in the UI.
+- **Responsive Design** Make the application work well on different screen sizes.
+
+### Development
+
+- **Git Workflow** Work with branches, pull requests, and commit messages.
