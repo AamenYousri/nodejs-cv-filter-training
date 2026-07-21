@@ -97,7 +97,7 @@ During this training, you will learn and practice these backend and frontend con
 
 ### Backend
 
-- **Authentication** Register and log in users using JWT.
+- **Authentication** Register and log in users using JWT _npm install bcrypt jsonwebtoken_.
 - **Authorization** Control what different users are allowed to do.
 - **Database Design** Create PostgreSQL tables and relationships.
 - **CRUD Operations** Create, read, update, and delete data.
@@ -110,7 +110,7 @@ During this training, you will learn and practice these backend and frontend con
 - **Logging** Log requests and errors for troubleshooting.
 - **Environment Variables** Store configuration values in a `.env` file.
 - **SQL Queries** Write SQL queries to work with the database.
-- **Testing** Write unit and integration tests.
+- **Testing** Write unit tests (optional).
 
 ### Frontend
 
