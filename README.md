@@ -21,14 +21,18 @@ https://tortoisegit.org/download/
 
 
 make sure that you have installed
-**node -v**
+**node -v** 
+
 **npm -v**
 
 
-**npm install** (install all dependencies)
+**npm install** 
+
+(install all dependencies)
 
 Initialize npm:
 **npm init -y **
+
 this creates package.json
 
 
