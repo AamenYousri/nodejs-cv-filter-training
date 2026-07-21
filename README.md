@@ -1,60 +1,90 @@
-"# nodejs-cv-filter-training" 
+# nodejs-cv-filter-training
 
-NodeJS
-https://nodejs.org/en/download
+## Prerequisites
 
+Install the following software before starting:
 
-PostgreSQL
-https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+- **Node.js**  
+  https://nodejs.org/en/download
 
+- **PostgreSQL**  
+  https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 
-VSCode
-https://code.visualstudio.com/download?_exp_download=fb315fc982
+- **Visual Studio Code**  
+  https://code.visualstudio.com/download
 
+- **Git**  
+  https://git-scm.com/downloads
 
-GIT
-https://git-scm.com/install/windows
+- **TortoiseGit (Optional)**  
+  https://tortoisegit.org/download/
 
+---
 
-TortoiseGIT (Optional)
-https://tortoisegit.org/download/
+## Verify Installation
 
+Open a terminal and verify that Node.js and npm are installed:
 
-make sure that you have installed
+```bash
+node -v
+npm -v
+```
 
-**node -v** 
+---
 
-**npm -v**
+## Project Setup
 
+Clone the repository:
 
+```bash
+git clone <repository-url>
+cd nodejs-cv-filter-training
+```
 
-**npm install** 
+Install all project dependencies:
 
-(install all dependencies)
+```bash
+npm install
+```
 
-Initialize npm:
+> **Note:** If this repository already contains a `package.json`, you **do not need** to run `npm init -y`.
 
-**npm init -y **
+If you are creating the project from scratch:
 
-this creates package.json
+```bash
+npm init -y
+```
 
+This creates the `package.json` file.
+
+---
+
+## Install Required Packages
 
 Install Express:
 
-**npm install express**
+```bash
+npm install express
+```
 
+Install the PostgreSQL driver:
 
-Install PostgreSQL driver:
-
-**npm install pg**
-
+```bash
+npm install pg
+```
 
 Install environment variable support:
 
-**npm install dotenv**
+```bash
+npm install dotenv
+```
 
+---
 
-<img width="718" height="591" alt="image" src="https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a" />
+## Database Setup
 
+1. Open **pgAdmin**.
+2. Create a new PostgreSQL database.
+3. Configure the database connection in your application.
 
-create database connection in PGAdmin
+![Database Setup](https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a)
