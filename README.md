@@ -88,3 +88,26 @@ npm install dotenv
 3. Configure the database connection in your application.
 
 ![Database Setup](https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a)
+
+
+
+
+## Training Objectives
+
+During this training, you will implement and practice the following backend concepts:
+
+- **Authentication** – Register users, log in, and manage JWT-based authentication.
+- **Authorization** – Restrict access to resources using role-based permissions.
+- **Database Design** – Create a normalized PostgreSQL schema with proper relationships.
+- **CRUD Operations** – Build REST APIs for creating, reading, updating, and deleting data.
+- **Fuzzy Search** – Implement intelligent candidate search with approximate text matching.
+- **Pagination** – Return large datasets efficiently using page-based results.
+- **Sorting & Filtering** – Allow clients to sort and filter data using query parameters.
+- **Request Validation** – Validate incoming requests before processing them.
+- **Global Error Handling** – Return consistent and meaningful API error responses.
+- **File Uploads** – Upload and store CVs (PDF/DOCX) using multipart requests.
+- **Logging** – Log application events, requests, and errors for debugging.
+- **Environment Variables** – Manage application configuration using `.env` files.
+- **SQL & Database Queries** – Write efficient SQL queries, joins, and transactions without relying on an ORM.
+- **Unit & Integration Testing** – Write automated tests to verify application behavior.
+- **Git Workflow** – Practice branching, pull requests, and writing meaningful commit messages.
