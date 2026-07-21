@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV Manager</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>CV Manager</h1>
+    <p>Store and manage your CVs</p>
+  </header>
+
+  <main>
+    <!-- Form -->
+    <section class="card" id="form-section">
+      <h2 id="form-title">Add New CV</h2>
+      <form id="cv-form">
+        <input type="hidden" id="edit-id" />
+        <div class="form-row">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" placeholder="John Doe" required />
+        </div>
+        <div class="form-row">
+          <label for="email">Email *</label>
+          <input type="email" id="email" placeholder="john@example.com" required />
+        </div>
+        <div class="form-row">
+          <label for="phone">Phone</label>
+          <input type="text" id="phone" placeholder="+1 555 000 0000" />
+        </div>
+        <div class="form-row">
+          <label for="skills">Skills</label>
+          <input type="text" id="skills" placeholder="JavaScript, Node.js, PostgreSQL" />
+        </div>
+        <div class="form-row">
+          <label for="experience">Experience</label>
+          <textarea id="experience" rows="3" placeholder="Describe your experience..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">Save CV</button>
+          <button type="button" id="cancel-btn" class="secondary hidden">Cancel</button>
+        </div>
+      </form>
+      <p class="msg hidden" id="form-msg"></p>
+    </section>
+
+    <!-- CV list -->
+    <section class="card" id="list-section">
+      <h2>All CVs</h2>
+      <div id="cv-list">
+        <p class="empty-msg">Loading…</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
