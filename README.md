@@ -119,7 +119,7 @@ During this training, you will learn and practice these backend and frontend con
 - **Forms** Create forms with validation and error messages.
 - **API Integration** Connect the frontend to the backend APIs.
 - **Search & Filters** Build search, filtering, and sorting in the UI.
-- **Responsive Design** Make the application work well on different screen sizes.
+- **Responsive Design** Make the application work well on different screen sizes - you can use bootstrap.
 
 ### Development
 
