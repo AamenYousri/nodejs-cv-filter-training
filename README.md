@@ -21,27 +21,27 @@ https://tortoisegit.org/download/
 
 
 make sure that you have installed
-node -v
-npm -v
+**node -v**
+**npm -v**
 
 
-npm install (install all dependencies)
+**npm install** (install all dependencies)
 
 Initialize npm:
-npm init -y 
+**npm init -y **
 this creates package.json
 
 
 Install Express:
-npm install express
+**npm install express**
 
 
 Install PostgreSQL driver:
-npm install pg
+**npm install pg**
 
 
 Install environment variable support:
-npm install dotenv
+**npm install dotenv**
 
 
 <img width="718" height="591" alt="image" src="https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a" />
