@@ -1,9 +1,9 @@
-const pool = require('../db');
+const cvQueries = require('../db/cvQueries');
 
 const getAllCVs = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM cvs ORDER BY created_at DESC');
-    res.json(result.rows);
+    const cvs = await cvQueries.getAllCVs();
+    res.json(cvs);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch CVs' });
@@ -13,11 +13,11 @@ const getAllCVs = async (req, res) => {
 const getCVById = async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM cvs WHERE id = $1', [id]);
-    if (result.rows.length === 0) {
+    const cv = await cvQueries.getCVById(id);
+    if (!cv) {
       return res.status(404).json({ error: 'CV not found' });
     }
-    res.json(result.rows[0]);
+    res.json(cv);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch CV' });
@@ -30,12 +30,8 @@ const createCV = async (req, res) => {
     return res.status(400).json({ error: 'Name and email are required' });
   }
   try {
-    const result = await pool.query(
-      `INSERT INTO cvs (name, email, phone, skills, experience)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [name, email, phone || null, skills || null, experience || null]
-    );
-    res.status(201).json(result.rows[0]);
+    const cv = await cvQueries.createCV(name, email, phone, skills, experience);
+    res.status(201).json(cv);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create CV' });
@@ -46,15 +42,11 @@ const updateCV = async (req, res) => {
   const { id } = req.params;
   const { name, email, phone, skills, experience } = req.body;
   try {
-    const result = await pool.query(
-      `UPDATE cvs SET name=$1, email=$2, phone=$3, skills=$4, experience=$5
-       WHERE id=$6 RETURNING *`,
-      [name, email, phone || null, skills || null, experience || null, id]
-    );
-    if (result.rows.length === 0) {
+    const cv = await cvQueries.updateCV(id, name, email, phone, skills, experience);
+    if (!cv) {
       return res.status(404).json({ error: 'CV not found' });
     }
-    res.json(result.rows[0]);
+    res.json(cv);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to update CV' });
@@ -64,8 +56,8 @@ const updateCV = async (req, res) => {
 const deleteCV = async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('DELETE FROM cvs WHERE id = $1 RETURNING id', [id]);
-    if (result.rows.length === 0) {
+    const cv = await cvQueries.deleteCV(id);
+    if (!cv) {
       return res.status(404).json({ error: 'CV not found' });
     }
     res.json({ message: 'CV deleted successfully' });

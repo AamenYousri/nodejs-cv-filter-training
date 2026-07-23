@@ -87,7 +87,9 @@ npm install dotenv
 2. Create a new PostgreSQL database.
 3. Configure the database connection in your application.
 
-![Database Setup](https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a)
+**Project Architecture:** This project follows a **Layered (N-Tier) Architecture**, separating the application into Presentation (public), Business Logic (controllers), and Data Access layers (db).
+
+![Project Setup](https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a)
 
 
 
