@@ -87,10 +87,16 @@ npm install dotenv
 2. Create a new PostgreSQL database.
 3. Configure the database connection in your application.
 
-**Project Architecture:** This project follows a **Layered (N-Tier) Architecture**, separating the application into Presentation (public), Business Logic (controllers), and Data Access layers (db).
+---
+
+
+## Project Architecture: 
+
+This project follows a **Layered (N-Tier) Architecture**, separating the application into Presentation (public), Business Logic (controllers), and Data Access layers (db).
 
 ![Project Setup](https://github.com/user-attachments/assets/9da3db0c-ec54-4230-a63b-6b410062a30a)
 
+---
 
 
 ## Training Objectives
@@ -126,3 +132,71 @@ During this training, you will learn and practice these backend and frontend con
 ### Development
 
 - **Git Workflow** Work with branches, pull requests, and commit messages.
+
+---
+
+## Git Workflow
+
+### Push Your Changes
+
+Follow these steps every time you want to push your work:
+
+1. **Pull latest changes first** - Right-click the project folder → **TortoiseGit** → **Pull**
+   - This fetches and merges the latest code from the remote before you push
+   - Always do this before committing to reduce conflicts
+
+2. **Stage your changes** - Right-click the project folder → **TortoiseGit** → **Commit...**
+   - A window opens showing all modified files
+   - Check the files you want to include in this commit
+
+3. **Write a commit message** - In the message box at the top, write a clear and descriptive message, for example:
+   ```
+   Add CV create endpoint with validation
+   ```
+
+4. **Commit and Push** - Click the **Commit & Push** button (bottom of the commit window)
+   - This commits your changes locally and pushes them to the remote branch in one step
+
+---
+
+### Resolve a Merge Conflict
+
+A conflict happens when two people edited the same lines differently. To resolve:
+
+1. **Pull** - Right-click the project folder → **TortoiseGit** → **Pull**
+   - TortoiseGit will warn you that there are conflicts
+
+2. **Open the conflict resolver** - Right-click the conflicted file → **TortoiseGit** → **Edit Conflicts**
+   - A three-panel diff tool opens:
+     - **Left panel** - your local changes
+     - **Right panel** - the incoming changes from the remote
+     - **Bottom panel** - the final merged result
+
+3. **Resolve each conflict** - For each conflicting block, right-click and choose:
+   - **Use this text block from mine** - to keep your version
+   - **Use this text block from theirs** - to keep the incoming version
+   - Or manually edit the bottom panel to combine both
+
+4. **Save and mark as resolved** - Save the file, then right-click it → **TortoiseGit** → **Resolved**
+
+5. **Commit the merge** - Right-click the project folder → **TortoiseGit** → **Commit...**
+   - The message will be pre-filled as a merge commit - you can keep it or edit it
+   - Click **Commit & Push**
+
+---
+
+### Branch Workflow
+
+1. **Create a new branch** - Right-click → **TortoiseGit** → **Create Branch**
+   - Name it after the feature, e.g. `feature/add-pagination`
+   - Check **Switch to new branch**
+
+2. **Work on your branch** - make changes, commit as normal
+
+3. **Push your branch** - Right-click → **TortoiseGit** → **Push**
+   - Select your branch name and push it to origin
+
+4. **Open a Pull Request** - go to the repository on GitHub/GitLab and open a PR from your branch into `main`
+
+5. **After merge** - switch back to `main` (Right-click → **TortoiseGit** → **Switch/Checkout** → select `main`), then **Pull** to get the latest
+
