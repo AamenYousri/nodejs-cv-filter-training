@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(150) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  otp_code VARCHAR(6),
+  otp_expires_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);

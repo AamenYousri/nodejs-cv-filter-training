@@ -1,8 +1,11 @@
+// server.js
+const express = require('express');
 require('dotenv').config();
-const app = require('./src/app');
-const pool = require('./src/db');
 
-const PORT = process.env.PORT || 3000;
+const authRoutes = require('./routes/auth.routes');
+
+const app = express();
+app.use(express.json()); // عشان نقدر نقرأ req.body لو الطلب JSON
 
 const initDB = async () => {
   await pool.query(`
@@ -42,13 +45,7 @@ const initDB = async () => {
   console.log('Database tables ready.');
 };
 
-initDB()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running at http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('Failed to initialise database:', err.message);
-    process.exit(1);
-  });
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
