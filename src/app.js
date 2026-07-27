@@ -11,6 +11,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API routes
 app.use('/api/cvs', cvRoutes);
 
+app.use('/api/auth', require('./routes/authRoutes'));
+
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
