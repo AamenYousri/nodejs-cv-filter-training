@@ -58,16 +58,16 @@ async function register(req, res) {
 
     // 6. جديد: نخزن اليوزر والـ OTP مع بعض في نفس الـ query
     const result = await pool.query(
-      `INSERT INTO users (name, email, password_hash, otp_code, otp_expires_at)
+      `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, email, created_at`,
+       RETURNING id, name, email, created_at, is_verified`,
       [name, email, password_hash, otpCode, otpExpiresAt]
     );
 
     const newUser = result.rows[0];
 
-    // مؤقتاً هنطبعه في الـ console بس (لسه معملناش إرسال إيميل فعلي)
-    console.log(`OTP for ${newUser.email}: ${otpCode}`);
+    // Email to be sent to the user with the OTP code (this part is just a placeholder, you need to implement actual email sending)
+    
 
     // 7. نرجّع الرد
     return res.status(201).json({
@@ -158,6 +158,8 @@ async function verifyOTP(req, res) {
     });
   }
 }
+
+
 
 const createAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '10d' });
