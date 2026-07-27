@@ -2,7 +2,7 @@
 const express = require('express');
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth.routes');
+const authRoutes = require('./src/routes/authRoutes');
 
 const app = express();
 app.use(express.json()); // عشان نقدر نقرأ req.body لو الطلب JSON
