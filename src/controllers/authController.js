@@ -3,13 +3,11 @@ const pool = require('../db');
 const authQueries = require('../db/authQueries');
 const jwt = require('jsonwebtoken');
 
-// دالة صغيرة بتتأكد إن الإيميل من الدومين المسموح بيه بس
 function isCompanyEmail(email) {
   const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN;
   return email.toLowerCase().endsWith(`@${allowedDomain.toLowerCase()}`);
 }
 
-// بتولّد رقم عشوائي من 6 أرقام (زي 048392)
 function generateOTP() {
   const otp = Math.floor(Math.random() * 1000000);
   return otp.toString().padStart(6, '0');
@@ -48,7 +46,7 @@ async function register(req, res) {
     const password_hash = await bcrypt.hash(password, 10);
 
     const otpCode = generateOTP();
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 دقايق
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
 
     const result = await pool.query(
       `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
@@ -59,8 +57,8 @@ async function register(req, res) {
 
     const newUser = result.rows[0];
 
-    // مؤقتاً هنطبعه في الـ console بس (لسه معملناش إرسال إيميل فعلي)
-    console.log(`OTP for ${newUser.email}: ${otpCode}`);
+    // Email to be sent to the user with the OTP code (this part is just a placeholder, you need to implement actual email sending)
+    
 
     return res.status(201).json({
       success: true,
@@ -88,7 +86,6 @@ async function verifyOTP(req, res) {
       });
     }
 
-    // ملحوظة: الأعمدة في الجدول اسمها otp_code و otp_expiry (مش otp_expires_at)
     const userResult = await pool.query(
       'SELECT id, otp_code, otp_expiry, is_verified FROM users WHERE email = $1',
       [email]
@@ -117,7 +114,7 @@ async function verifyOTP(req, res) {
       });
     }
 
-    if (new Date() > new Date(user.otp_expiry)) {
+    if (new Date() > new Date(user.otp_expires_at)) {
       return res.status(400).json({
         success: false,
         error: 'OTP has expired',
@@ -144,6 +141,8 @@ async function verifyOTP(req, res) {
     });
   }
 }
+
+
 
 const createAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '10d' });
