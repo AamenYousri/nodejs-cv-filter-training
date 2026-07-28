@@ -1,4 +1,3 @@
-
 const bcrypt = require('bcrypt');
 const pool = require('../db');
 const authQueries = require('../db/authQueries');
@@ -88,7 +87,7 @@ async function verifyOTP(req, res) {
     }
 
     const userResult = await pool.query(
-      'SELECT id, otp_code, otp_expires_at, is_verified FROM users WHERE email = $1',
+      'SELECT id, otp_code, otp_expiry, is_verified FROM users WHERE email = $1',
       [email]
     );
 
@@ -124,7 +123,7 @@ async function verifyOTP(req, res) {
 
     await pool.query(
       `UPDATE users
-       SET is_verified = TRUE, otp_code = NULL, otp_expires_at = NULL
+       SET is_verified = TRUE, otp_code = NULL, otp_expiry = NULL
        WHERE id = $1`,
       [user.id]
     );
