@@ -1,60 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CV Manager</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentGrid - Complete App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Authentication Background with Image */
+        .bg-auth {
+            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), 
+                        url('generated-image (7).png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        /* Custom Scrollbar for dashboard */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>CV Manager</h1>
-    <p>Store and manage your CVs</p>
-  </header>
+<body class="font-sans text-slate-800 overflow-hidden h-screen bg-gray-100">
 
-  <main>
-    <!-- Form -->
-    <section class="card" id="form-section">
-      <h2 id="form-title">Add New CV</h2>
-      <form id="cv-form">
-        <input type="hidden" id="edit-id" />
-        <div class="form-row">
-          <label for="name">Full Name *</label>
-          <input type="text" id="name" placeholder="John Doe" required />
-        </div>
-        <div class="form-row">
-          <label for="email">Email *</label>
-          <input type="email" id="email" placeholder="john@example.com" required />
-        </div>
-        <div class="form-row">
-          <label for="phone">Phone</label>
-          <input type="text" id="phone" placeholder="+1 555 000 0000" />
-        </div>
-        <div class="form-row">
-          <label for="skills">Skills</label>
-          <input type="text" id="skills" placeholder="JavaScript, Node.js, PostgreSQL" />
-        </div>
-        <div class="form-row">
-          <label for="experience">Experience</label>
-          <textarea id="experience" rows="3" placeholder="Describe your experience..."></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="submit" id="submit-btn">Save CV</button>
-          <button type="button" id="cancel-btn" class="secondary hidden">Cancel</button>
-        </div>
-      </form>
-      <p class="msg hidden" id="form-msg"></p>
-    </section>
+    <!-- ==========================================
+         AUTHENTICATION SECTION (Login, Register, Reset)
+         ========================================== -->
+    <div id="auth-layout" class="bg-auth h-full flex items-center justify-center relative w-full block">
+        <!-- Abstract Background Pattern -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
 
-    <!-- CV list -->
-    <section class="card" id="list-section">
-      <h2>All CVs</h2>
-      <div id="cv-list">
-        <p class="empty-msg">Loading…</p>
-      </div>
-    </section>
-  </main>
+        <!-- 1. LOGIN VIEW -->
+        <div id="login-view" class="bg-slate-100 rounded-xl shadow-2xl w-full max-w-md overflow-hidden z-10 block">
+            <div class="bg-slate-800 p-6 flex items-center space-x-3 text-white">
+                <div class="bg-white p-2 rounded text-blue-900"><i class="fa-solid fa-user-tie text-xl"></i></div>
+                <div>
+                    <h1 class="text-xl font-bold">TalentGrid</h1>
+                    <p class="text-xs text-slate-300">HR SOLUTIONS</p>
+                </div>
+            </div>
+            <div class="p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Welcome Back</h2>
+                    <p class="text-sm text-slate-500">Login in to Your Employer Dashboard</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-regular fa-envelope"></i></span>
+                        <input type="email" placeholder="Email Address" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" placeholder="Password" class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 cursor-pointer"><i class="fa-regular fa-eye-slash"></i></span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <label class="flex items-center space-x-2 cursor-pointer text-slate-600">
+                            <input type="checkbox" class="rounded text-blue-800 focus:ring-blue-800"> <span>Remember Me</span>
+                        </label>
+                        <button onclick="switchView('reset-view')" class="text-slate-800 font-semibold hover:underline">Forget Password?</button>
+                    </div>
+                    <!-- Login Button routes to Dashboard -->
+                    <button onclick="switchToDashboard('candidates-view')" class="w-full bg-slate-800 text-white font-semibold py-2 rounded-lg hover:bg-slate-700 transition duration-200">
+                        Login
+                    </button>
+                </div>
+                <div class="mt-6 flex items-center justify-center space-x-2">
+                    <span class="h-px w-1/4 bg-slate-300"></span><span class="text-xs text-slate-400">or continue with</span><span class="h-px w-1/4 bg-slate-300"></span>
+                </div>
+                <button class="mt-4 w-full flex items-center justify-center bg-white border border-slate-300 py-2 rounded-lg hover:bg-slate-50 transition">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" class="w-5 h-5">
+                </button>
+                <div class="mt-6 text-center text-xs text-slate-600">
+                    Don't have an account? <button onclick="switchView('register-view')" class="text-blue-600 font-bold hover:underline">Sign up</button>
+                </div>
+            </div>
+        </div>
 
-  <script src="app.js"></script>
+        <!-- 2. REGISTER VIEW -->
+        <div id="register-view" class="bg-slate-100 rounded-xl shadow-2xl w-full max-w-md overflow-hidden z-10 hidden">
+            <div class="bg-slate-800 p-6 flex items-center space-x-3 text-white">
+                <div class="bg-white p-2 rounded text-blue-900"><i class="fa-solid fa-user-tie text-xl"></i></div>
+                <div><h1 class="text-xl font-bold">TalentGrid</h1><p class="text-xs text-slate-300">HR SOLUTIONS</p></div>
+            </div>
+            <div class="p-8">
+                <div class="text-center mb-6"><h2 class="text-2xl font-bold text-slate-800">Register</h2></div>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" placeholder="First Name" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                        <input type="text" placeholder="Last Name" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-regular fa-envelope"></i></span>
+                        <input type="email" placeholder="Email Address" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" placeholder="Password" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" placeholder="Confirm Password" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm">
+                    </div>
+                    <button onclick="switchView('login-view')" class="w-full mt-2 bg-slate-800 text-white font-semibold py-2 rounded-lg hover:bg-slate-700 transition">Sign up</button>
+                </div>
+                <div class="mt-4 text-center text-xs text-slate-600">
+                    Already have an account? <button onclick="switchView('login-view')" class="text-blue-600 font-bold hover:underline">Log in</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. RESET PASSWORD VIEW -->
+        <div id="reset-view" class="bg-slate-100 rounded-xl shadow-2xl w-full max-w-md overflow-hidden z-10 hidden">
+            <div class="bg-slate-800 p-6 flex items-center space-x-3 text-white">
+                <div class="bg-white p-2 rounded text-blue-900"><i class="fa-solid fa-user-tie text-xl"></i></div>
+                <div><h1 class="text-xl font-bold">TalentGrid</h1></div>
+            </div>
+            <div class="p-8">
+                <button onclick="switchView('login-view')" class="text-sm text-slate-500 hover:text-slate-800 mb-4"><i class="fa-solid fa-arrow-left"></i> Back to login</button>
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Reset Your Password</h2>
+                    <p class="text-xs text-slate-500 px-4">Forgot your password? Enter your email so we can send your 4 digit code</p>
+                </div>
+                <div class="space-y-4">
+                    <input type="email" placeholder="Your Email" class="w-full px-4 py-3 bg-slate-200 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm text-center">
+                    <button class="w-full bg-slate-800 text-white font-semibold py-3 rounded-lg hover:bg-slate-700 transition">Get Code</button>
+                    <div class="relative mt-4">
+                        <input type="text" placeholder="4 digit code" class="w-full px-4 py-3 bg-slate-200 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm text-center tracking-widest">
+                        <button class="absolute inset-y-0 right-2 flex items-center justify-center text-slate-800 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-circle-play text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         DASHBOARD SECTION (Sidebar + Main Content)
+         ========================================== -->
+    <div id="dashboard-layout" class="h-full flex hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-[#1b263b] text-white flex flex-col justify-between h-full shadow-lg z-20">
+            <div>
+                <div class="p-6 flex items-center space-x-3 border-b border-slate-700">
+                    <div class="bg-white p-1.5 rounded text-blue-900"><i class="fa-solid fa-user-tie text-lg"></i></div>
+                    <h1 class="text-xl font-bold">TalentGrid</h1>
+                </div>
+                <nav class="mt-6 px-4 space-y-2">
+                    <button id="nav-candidates" onclick="switchDashboardView('candidates-view')" class="w-full flex items-center space-x-3 px-4 py-3 bg-white text-slate-800 rounded-lg font-medium transition border border-slate-300">
+                        <i class="fa-solid fa-house"></i><span>Dashboard</span>
+                    </button>
+                    <!-- Trigger for Upload Modal -->
+                    <button id="nav-upload" onclick="toggleUploadModal(true)" class="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition border border-transparent">
+                        <i class="fa-solid fa-upload"></i><span>Upload CVs</span>
+                    </button>
+                    <button id="nav-library" onclick="switchDashboardView('library-view')" class="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition border border-transparent">
+                        <i class="fa-solid fa-folder"></i><span>Library</span>
+                    </button>
+                    <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:bg-slate-800 hover:text-red-300 rounded-lg font-medium transition mt-8">
+                        <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                    </button>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-slate-700 flex items-center space-x-3 bg-[#131b2b]">
+                <div class="bg-white text-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-user"></i></div>
+                <span class="text-sm font-medium">Ahmed Tarek</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden relative bg-gray-100">
+            
+            <!-- Dynamic Top Header -->
+            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center z-10">
+                <h2 class="text-xl font-bold text-slate-800">Filter <i class="fa-solid fa-filter text-sm ml-1 text-slate-400"></i></h2>
+                <div class="relative w-72">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm bg-slate-50">
+                </div>
+            </header>
+
+            <!-- Scrollable Content Container -->
+            <div class="flex-1 overflow-y-auto p-8 relative">
+                
+                <!-- 4. CANDIDATES LIST VIEW -->
+                <div id="candidates-view" class="block">
+                    <!-- Filters -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex space-x-4 border border-slate-200">
+                        <div class="flex-1 border border-slate-300 rounded-lg px-3 py-2 flex items-center justify-between text-sm text-slate-600">
+                            <div class="flex items-center space-x-2"><i class="fa-solid fa-earth-americas"></i> <span>Country</span></div><i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                        <div class="flex-1 border border-slate-300 rounded-lg px-3 py-2 flex items-center justify-between text-sm text-slate-600">
+                            <div class="flex items-center space-x-2"><i class="fa-solid fa-location-dot"></i> <span>City</span></div><i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                        <div class="flex-1 border border-slate-300 rounded-lg px-3 py-2 flex items-center justify-between text-sm text-slate-600">
+                            <div class="flex items-center space-x-2"><i class="fa-solid fa-briefcase"></i> <span>Job Title</span></div><i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                        <div class="flex-1 border border-slate-300 rounded-lg px-3 py-2 flex items-center justify-between text-sm text-slate-600">
+                            <div class="flex items-center space-x-2"><i class="fa-solid fa-clock-rotate-left"></i> <span>Experience</span></div><i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-4 border-b border-slate-200"><h3 class="text-lg font-bold text-slate-800">Candidates List</h3></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3 font-semibold">Name</th><th class="px-6 py-3 font-semibold">Job Title</th>
+                                        <th class="px-6 py-3 font-semibold">Experience</th><th class="px-6 py-3 font-semibold">City</th>
+                                        <th class="px-6 py-3 font-semibold">Match Score</th><th class="px-6 py-3 font-semibold">Status</th>
+                                        <th class="px-6 py-3 font-semibold text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-800">
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="px-6 py-4 font-medium">Ahmed Tarek</td><td class="px-6 py-4">Software Developer</td><td class="px-6 py-4">3 Years</td><td class="px-6 py-4">Alexandria, Egypt</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">95% Match</span></td>
+                                        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Review</span></td>
+                                        <td class="px-6 py-4 flex justify-center space-x-2">
+                                            <button class="bg-slate-200 text-slate-600 px-2 py-1 rounded text-xs"><i class="fa-regular fa-file-pdf"></i> CV</button>
+                                            <button class="bg-green-500 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-check"></i> Accept</button>
+                                            <button class="bg-red-500 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="px-6 py-4 font-medium">Mohamed Ahmed</td><td class="px-6 py-4">Software Developer</td><td class="px-6 py-4">2 Years</td><td class="px-6 py-4">Cairo, Egypt</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">83% Match</span></td>
+                                        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Review</span></td>
+                                        <td class="px-6 py-4 flex justify-center space-x-2">
+                                            <button class="bg-slate-200 text-slate-600 px-2 py-1 rounded text-xs"><i class="fa-regular fa-file-pdf"></i> CV</button>
+                                            <button class="bg-green-500 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-check"></i> Accept</button>
+                                            <button class="bg-red-500 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="px-6 py-4 font-medium">Aly Mohamed</td><td class="px-6 py-4">Software Engineer</td><td class="px-6 py-4">4 Years</td><td class="px-6 py-4">Cairo, Egypt</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">76% Match</span></td>
+                                        <td class="px-6 py-4"><span class="bg-green-400 text-white px-3 py-1 rounded-full text-xs font-bold">Accepted</span></td>
+                                        <td class="px-6 py-4 flex justify-center space-x-2">
+                                            <button class="bg-slate-200 text-slate-600 px-2 py-1 rounded text-xs"><i class="fa-regular fa-file-pdf"></i> CV</button>
+                                            <button class="bg-blue-500 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-envelope"></i> Send Email</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. CV LIBRARY VIEW -->
+                <div id="library-view" class="hidden">
+                    <!-- Filters -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex space-x-4 border border-slate-200 w-fit">
+                        <div class="w-40 border border-slate-300 rounded-lg px-3 py-2 flex items-center justify-between text-sm text-slate-600 bg-slate-50">
+                            <span>Status</span><i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                        <div class="w-40 border border-slate-300 rounded-lg px-3 py-2 flex items-center justify-between text-sm text-slate-600 bg-slate-50">
+                            <span>Date</span><i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-5 border-b border-slate-200"><h3 class="text-lg font-bold text-slate-800">CV Library</h3></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold flex items-center space-x-1"><span>Filename</span> <i class="fa-solid fa-chevron-down text-[10px]"></i></th>
+                                        <th class="px-6 py-4 font-semibold">Document type <i class="fa-solid fa-chevron-down text-[10px]"></i></th>
+                                        <th class="px-6 py-4 font-semibold text-center">Status <i class="fa-solid fa-chevron-down text-[10px]"></i></th>
+                                        <th class="px-6 py-4 font-semibold">Date <i class="fa-solid fa-chevron-down text-[10px]"></i></th>
+                                        <th class="px-6 py-4 font-semibold text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-800 font-medium">
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="px-6 py-4 flex items-center space-x-2"><i class="fa-solid fa-file-pdf text-red-500 text-lg"></i><span>Ahmed_Tarek.pdf</span></td>
+                                        <td class="px-6 py-4">Pdf</td>
+                                        <td class="px-6 py-4 text-center"><span class="bg-yellow-300 text-yellow-800 px-4 py-1 rounded-full text-xs font-bold">Review</span></td>
+                                        <td class="px-6 py-4">12/02/2026</td>
+                                        <td class="px-6 py-4 flex justify-center space-x-2">
+                                            <button class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded text-xs hover:bg-slate-300"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> CV</button>
+                                            <button class="bg-red-500 text-white px-3 py-1.5 rounded text-xs hover:bg-red-600"><i class="fa-solid fa-xmark mr-1"></i> Delete</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="px-6 py-4 flex items-center space-x-2"><i class="fa-solid fa-file-word text-blue-500 text-lg"></i><span>Adam_Ghanem.pdf</span></td>
+                                        <td class="px-6 py-4">Pdf</td>
+                                        <td class="px-6 py-4 text-center"><span class="bg-green-400 text-white px-4 py-1 rounded-full text-xs font-bold">Accepted</span></td>
+                                        <td class="px-6 py-4">12/02/2026</td>
+                                        <td class="px-6 py-4 flex justify-center space-x-2">
+                                            <button class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded text-xs hover:bg-slate-300"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> CV</button>
+                                            <button class="bg-red-500 text-white px-3 py-1.5 rounded text-xs hover:bg-red-600"><i class="fa-solid fa-xmark mr-1"></i> Delete</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. UPLOAD MODAL OVERLAY -->
+                <div id="upload-modal" class="absolute inset-0 z-50 bg-slate-900 bg-opacity-40 hidden flex items-center justify-center p-4 rounded-xl backdrop-blur-sm transition-all duration-300">
+                    <!-- Modal Content (Dropzone) -->
+                    <div class="relative bg-[#aeb7c2] w-[450px] p-12 rounded-lg shadow-2xl border-[3px] border-dashed border-[#8c98a6] flex flex-col items-center justify-center text-center">
+                        
+                        <!-- Close Button -->
+                        <button onclick="toggleUploadModal(false)" class="absolute top-4 right-4 text-slate-600 hover:text-slate-900 transition">
+                            <i class="fa-solid fa-xmark text-2xl"></i>
+                        </button>
+                        
+                        <!-- Upload Icon -->
+                        <div class="mb-4 text-[#5c6a7a]">
+                            <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
+                        </div>
+                        
+                        <!-- Upload Text -->
+                        <h3 class="text-slate-800 text-lg font-medium mb-3">
+                            Drag & drop CV files or 
+                            <span onclick="document.getElementById('file-upload').click()" class="font-bold underline cursor-pointer hover:text-white transition">Browse</span>
+                        </h3>
+                        <p class="text-sm text-slate-100 font-medium bg-[#8c98a6] px-3 py-1 rounded-full">Supported formats: PDF, DOCX up to 20MB each</p>
+                        
+                        <!-- Hidden File Input -->
+                        <input type="file" class="hidden" id="file-upload" multiple accept=".pdf,.docx">
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Logic (Routing/Toggling Views) -->
+    <script>
+        // DOM Elements
+        const authLayout = document.getElementById('auth-layout');
+        const dashboardLayout = document.getElementById('dashboard-layout');
+        const uploadModal = document.getElementById('upload-modal');
+        
+        const authViews = ['login-view', 'register-view', 'reset-view'];
+        const dashboardViews = ['candidates-view', 'library-view'];
+
+        // Function to toggle views WITHIN the Authentication Layout
+        function switchView(viewId) {
+            authViews.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('block');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+            document.getElementById(viewId).classList.add('block');
+        }
+
+        // Function to transition from Auth Layout to Dashboard Layout
+        function switchToDashboard(defaultViewId) {
+            authLayout.classList.add('hidden');
+            authLayout.classList.remove('flex');
+            
+            dashboardLayout.classList.remove('hidden');
+            dashboardLayout.classList.add('flex');
+            
+            switchDashboardView(defaultViewId);
+        }
+
+        // Function to logout (Dashboard back to Auth)
+        function logout() {
+            dashboardLayout.classList.add('hidden');
+            dashboardLayout.classList.remove('flex');
+            
+            authLayout.classList.remove('hidden');
+            authLayout.classList.add('flex');
+            
+            switchView('login-view');
+            toggleUploadModal(false); // Ensure modal is closed on logout
+        }
+
+        // Function to toggle views WITHIN the Dashboard Layout
+        function switchDashboardView(viewId) {
+            // Close upload modal if open when switching views
+            toggleUploadModal(false);
+
+            // Hide all dashboard views
+            dashboardViews.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('block');
+            });
+            // Show selected view
+            document.getElementById(viewId).classList.remove('hidden');
+            document.getElementById(viewId).classList.add('block');
+
+            // Handle Sidebar active states based on the view
+            const navCandidates = document.getElementById('nav-candidates');
+            const navLibrary = document.getElementById('nav-library');
+            const navUpload = document.getElementById('nav-upload');
+
+            // Reset classes
+            navCandidates.className = "w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition border border-transparent";
+            navLibrary.className = "w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition border border-transparent";
+            navUpload.className = "w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition border border-transparent";
+
+            // Apply active class
+            const activeClass = "w-full flex items-center space-x-3 px-4 py-3 bg-white text-slate-800 rounded-lg font-medium transition border border-slate-300 shadow-sm";
+            
+            if (viewId === 'candidates-view') {
+                navCandidates.className = activeClass;
+            } else if (viewId === 'library-view') {
+                navLibrary.className = activeClass;
+            }
+        }
+
+        // Function to toggle the Upload CV Modal
+        function toggleUploadModal(show) {
+            const navUpload = document.getElementById('nav-upload');
+            
+            if (show) {
+                uploadModal.classList.remove('hidden');
+                uploadModal.classList.add('flex');
+                
+                // Temporarily highlight the upload button
+                navUpload.classList.add('bg-slate-800', 'text-white');
+            } else {
+                uploadModal.classList.add('hidden');
+                uploadModal.classList.remove('flex');
+                
+                // Remove highlight from upload button
+                navUpload.classList.remove('bg-slate-800', 'text-white');
+            }
+        }
+    </script>
 </body>
 </html>
