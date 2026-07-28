@@ -1,0 +1,14 @@
+// routes/auth.routes.js
+const express = require('express');
+const router = express.Router();
+const { register, verifyOTP, login } = require('../controllers/authController');
+
+// POST /auth/register
+router.post('/register', register);
+
+// POST /auth/verify-otp
+router.post('/verify-otp', verifyOTP);
+
+router.post('/login', login);
+
+module.exports = router;
