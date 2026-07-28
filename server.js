@@ -6,7 +6,7 @@ const path = require('path');
 const authRoutes = require('./src/routes/authRoutes');
 
 const app = express();
-app.use(express.json()); // عشان نقدر نقرأ req.body لو الطلب JSON
+app.use(express.json()); 
 
 const initDB = async () => {
   await pool.query(`
