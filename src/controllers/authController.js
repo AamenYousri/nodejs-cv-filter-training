@@ -1,4 +1,3 @@
-
 const bcrypt = require('bcrypt');
 const pool = require('../db');
 const authQueries = require('../db/authQueries');
@@ -20,7 +19,6 @@ async function register(req, res) {
   try {
     const { name, email, password } = req.body;
 
-    // 1. Validation بسيطة الأول
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -28,7 +26,6 @@ async function register(req, res) {
       });
     }
 
-    // 2. نتأكد إن الإيميل من دومين الشركة بس
     if (!isCompanyEmail(email)) {
       return res.status(400).json({
         success: false,
@@ -36,7 +33,6 @@ async function register(req, res) {
       });
     }
 
-    // 3. نتأكد إن الإيميل مش مستخدم قبل كده
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       [email]
@@ -49,18 +45,15 @@ async function register(req, res) {
       });
     }
 
-    // 4. نعمل hash للباسورد قبل ما نخزنه
     const password_hash = await bcrypt.hash(password, 10);
 
-    // 5. جديد: نجهّز الـ OTP وميعاد انتهاءه قبل الـ INSERT
     const otpCode = generateOTP();
     const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 دقايق
 
-    // 6. جديد: نخزن اليوزر والـ OTP مع بعض في نفس الـ query
     const result = await pool.query(
-      `INSERT INTO users (name, email, password_hash, otp_code, otp_expires_at)
+      `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, email, created_at`,
+       RETURNING id, name, email, created_at, is_verified`,
       [name, email, password_hash, otpCode, otpExpiresAt]
     );
 
@@ -69,7 +62,6 @@ async function register(req, res) {
     // مؤقتاً هنطبعه في الـ console بس (لسه معملناش إرسال إيميل فعلي)
     console.log(`OTP for ${newUser.email}: ${otpCode}`);
 
-    // 7. نرجّع الرد
     return res.status(201).json({
       success: true,
       message: 'Registered successfully. Please verify your email using the OTP sent.',
@@ -85,12 +77,10 @@ async function register(req, res) {
   }
 }
 
-// جديد: function منفصلة للتحقق من الـ OTP
 async function verifyOTP(req, res) {
   try {
     const { email, otp } = req.body;
 
-    // 1. Validation بسيطة
     if (!email || !otp) {
       return res.status(400).json({
         success: false,
@@ -98,9 +88,9 @@ async function verifyOTP(req, res) {
       });
     }
 
-    // 2. نجيب اليوزر بالإيميل ده
+    // ملحوظة: الأعمدة في الجدول اسمها otp_code و otp_expiry (مش otp_expires_at)
     const userResult = await pool.query(
-      'SELECT id, otp_code, otp_expires_at, is_verified FROM users WHERE email = $1',
+      'SELECT id, otp_code, otp_expiry, is_verified FROM users WHERE email = $1',
       [email]
     );
 
@@ -113,7 +103,6 @@ async function verifyOTP(req, res) {
 
     const user = userResult.rows[0];
 
-    // 3. لو اليوزر متفعّل بالفعل من قبل
     if (user.is_verified) {
       return res.status(400).json({
         success: false,
@@ -121,7 +110,6 @@ async function verifyOTP(req, res) {
       });
     }
 
-    // 4. نتأكد إن الكود صح
     if (user.otp_code !== otp) {
       return res.status(400).json({
         success: false,
@@ -129,18 +117,16 @@ async function verifyOTP(req, res) {
       });
     }
 
-    // 5. نتأكد إن الكود لسه صالح (مانتهاش)
-    if (new Date() > new Date(user.otp_expires_at)) {
+    if (new Date() > new Date(user.otp_expiry)) {
       return res.status(400).json({
         success: false,
         error: 'OTP has expired',
       });
     }
 
-    // 6. كل حاجة تمام - نفعّل اليوزر ونمسح الكود (عشان مايتستخدمش تاني)
     await pool.query(
       `UPDATE users
-       SET is_verified = TRUE, otp_code = NULL, otp_expires_at = NULL
+       SET is_verified = TRUE, otp_code = NULL, otp_expiry = NULL
        WHERE id = $1`,
       [user.id]
     );
