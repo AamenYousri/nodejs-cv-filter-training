@@ -65,7 +65,7 @@ async function register(req, res) {
       success: true,
       message:
         "Registered successfully. Please verify your email using the OTP sent.",
-      data: newUser,
+        token: generateAccessToken(newUser),
     });
   } catch (err) {
     console.error(err);
