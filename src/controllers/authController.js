@@ -1,7 +1,8 @@
-const bcrypt = require("bcrypt");
-const pool = require("../db");
-const authQueries = require("../db/authQueries");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const pool = require('../db');
+const authQueries = require('../db/authQueries');
+const jwt = require('jsonwebtoken');
+const { sendOTPEmail } = require('./emailController');
 
 function isCompanyEmail(email) {
   const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN;
@@ -20,7 +21,7 @@ async function register(req, res) {
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        error: "name, email, and password are required",
+        error: 'Name, email, and password are required',
       });
     }
 
@@ -51,13 +52,14 @@ async function register(req, res) {
 
     const result = await pool.query(
       `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
-   VALUES ($1, $2, $3, $4, $5)
-   RETURNING id, name, email, created_at, is_verified`,
-      [name, email, password_hash, otpCodeHash, otpExpiresAt],
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, name, email, created_at, is_verified, OTP_CODE`,
+      [name, email, password_hash, otpCode, otpExpiresAt]
     );
     const newUser = result.rows[0];
 
-    console.log(`OTP for ${newUser.email}: ${otpCode}`);
+    await sendOTPEmail(newUser);
+    
 
     return res.status(201).json({
       success: true,
@@ -72,6 +74,15 @@ async function register(req, res) {
       error: "Something went wrong while registering",
     });
   }
+}
+
+function regenerateOTP(user) {
+  const otpCode = generateOTP();
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+  return pool.query(
+    `UPDATE users SET OTP_CODE = $1, OTP_EXPIRY = $2 WHERE id = $3 RETURNING *`,
+    [otpCode, otpExpiresAt, user.id]
+  );
 }
 
 async function verifyOTP(req, res) {
@@ -113,6 +124,7 @@ async function verifyOTP(req, res) {
         error: "Invalid OTP",
       });
     }
+
     if (new Date() > new Date(user.otp_expiry)) {
       return res.status(400).json({
         success: false,
@@ -198,9 +210,28 @@ async function resendOTP(req, res) {
   }
 }
 
+const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  const user = result.rows[0];
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const updatedUser = regenerateOTP(user);
+  return res.status(200).json({ message: 'OTP resent successfully'});
+
+}
+
 async function forgotPassword(req, res) {
   try {
     const { email } = req.body;
+
 
     if (!email) {
       return res.status(400).json({
@@ -350,11 +381,31 @@ const login = async (req, res) => {
   res.json({ message: "Login successful", accessToken: token });
 };
 
-module.exports = {
-  register,
-  verifyOTP,
-  resendOTP,
-  forgotPassword,
-  resetPassword,
-  login,
-};
+const login = async (req, res) => {
+
+  const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(401).json({ error: 'All fields are required' });
+    }
+    
+    const user = await authQueries.getUserByEmail(email);
+
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    else if (!user.is_verified) {
+      return res.status(403).json({ error: 'Email not verified. Please verify your email before logging in.' });
+    } 
+
+        if (await bcrypt.compare(password, user.password_hash)) {
+            const token = createAccessToken(user);
+            res.json({ message: 'Login successful', accessToken: token });
+        } else {
+            res.status(401).json({ error: 'Invalid email or password' });
+        }
+    
+}
+
+module.exports = { register, verifyOTP, login, resendOTP, forgotPassword, resetPassword };

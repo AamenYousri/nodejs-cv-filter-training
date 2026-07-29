@@ -2,14 +2,10 @@
 const express = require('express');
 require('dotenv').config();
 const path = require('path');
-const pool = require('./src/db');
-
+const pool = require('./src/db/index');
 const authRoutes = require('./src/routes/authRoutes');
-
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 const initDB = async () => {
   await pool.query(`
@@ -50,6 +46,23 @@ CREATE TABLE IF NOT EXISTS users (
   `);
   console.log('Database tables ready.');
 };
+
+const PORT = process.env.PORT || 3000;
+
+initDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Database initialization failed:', err);
+    process.exit(1);
+  });
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
 app.use('/api/cvs', require('./src/routes/cvRoutes'));

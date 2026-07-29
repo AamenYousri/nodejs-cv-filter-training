@@ -1,6 +1,4 @@
-// db/index.js
-// بنعمل "pool" واحد بس للاتصال بالـ database، وأي ملف تاني محتاج
-// ينفذ query هيستورد الـ pool ده بدل ما يفتح اتصال جديد كل مرة
+
 
 const { Pool } = require('pg');
 require('dotenv').config();
