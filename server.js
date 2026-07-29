@@ -1,10 +1,10 @@
 // server.js
-const express = require('express');
-require('dotenv').config();
-const path = require('path');
-const pool = require('./src/db/index');
+const express = require("express");
+require("dotenv").config();
+const path = require("path");
+const pool = require("./src/db/index");
 
-const authRoutes = require('./src/routes/authRoutes');
+const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 app.use(express.json());
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS users (
       uploaded_at  TIMESTAMPTZ DEFAULT NOW()
     );
   `);
-  console.log('Database tables ready.');
+  console.log("Database tables ready.");
 };
 
 const PORT = process.env.PORT || 3000;
@@ -57,22 +57,20 @@ initDB()
     });
   })
   .catch((err) => {
-    console.error('Database initialization failed:', err);
+    console.error("Database initialization failed:", err);
     process.exit(1);
   });
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "src", "public")));
 
 // API routes
-app.use('/api/cvs', require('./src/routes/cvRoutes'));
-app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use("/api/cvs", require("./src/routes/cvRoutes"));
+app.use("/api/auth", require("./src/routes/authRoutes"));
 
 // Serve the UI for any other route
-app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get("/{*path}", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "public", "index.html"));
 });
 
 module.exports = app;
-
-
