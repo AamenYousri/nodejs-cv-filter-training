@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const pool = require('../db');
 const authQueries = require('../db/authQueries');
 const jwt = require('jsonwebtoken');
+const { sendOTPEmail } = require('./emailController');
 
 function isCompanyEmail(email) {
   const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN;
@@ -51,13 +52,13 @@ async function register(req, res) {
     const result = await pool.query(
       `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, email, created_at, is_verified`,
+       RETURNING id, name, email, created_at, is_verified, OTP_CODE`,
       [name, email, password_hash, otpCode, otpExpiresAt]
     );
 
     const newUser = result.rows[0];
 
-    // Email to be sent to the user with the OTP code (this part is just a placeholder, you need to implement actual email sending)
+    await sendOTPEmail(newUser);
     
 
     return res.status(201).json({
@@ -75,7 +76,7 @@ async function register(req, res) {
   }
 }
 
-async function regenerateOTP(user) {
+function regenerateOTP(user) {
   const otpCode = generateOTP();
   const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
   return pool.query(
@@ -123,7 +124,7 @@ async function verifyOTP(req, res) {
       });
     }
 
-    if (new Date() > new Date(user.otp_expires_at)) {
+    if (new Date() > new Date(user.otp_expiry)) {
       return res.status(400).json({
         success: false,
         error: 'OTP has expired',
@@ -152,6 +153,20 @@ async function verifyOTP(req, res) {
 }
 
 const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  const user = result.rows[0];
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const updatedUser = regenerateOTP(user);
+  return res.status(200).json({ message: 'OTP resent successfully'});
 
 }
 
