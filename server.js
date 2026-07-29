@@ -6,6 +6,7 @@ const pool = require('./src/db/index');
 const authRoutes = require('./src/routes/authRoutes');
 const app = express();
 app.use(express.json());
+const cors = require('cors');
 
 const initDB = async () => {
   await pool.query(`
@@ -24,8 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
 
     CREATE TABLE IF NOT EXISTS candidates (
       id                  SERIAL PRIMARY KEY,
-      name                VARCHAR(150) NOT NULL,
-      email               VARCHAR(150) NOT NULL,
+      name                VARCHAR(150),
+      email               VARCHAR(150),
       city                VARCHAR(100),
       job_title           VARCHAR(150),
       years_of_experience INTEGER,
@@ -62,6 +63,7 @@ initDB()
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 
 // API routes
 app.use('/api/cvs', require('./src/routes/cvRoutes'));
@@ -72,6 +74,32 @@ app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.use(
+  '/api/uploads',
+  express.static('uploads')
+);
+
+
+
+const cvRoutes =
+  require('./src/routes/cvRoutes');
+
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use(
+  '/api/cv',
+  cvRoutes
+);
+
+
 module.exports = app;
+
+
+
+
+
 
 

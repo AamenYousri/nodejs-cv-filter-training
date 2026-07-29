@@ -1,70 +1,192 @@
-const cvQueries = require('../db/cvQueries');
+const pool = require('../db/index');
 
-const getAllCVs = async (req, res) => {
-  try {
-    const cvs = await cvQueries.getAllCVs();
-    res.json(cvs);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch CVs' });
-  }
-};
+const uploadCV = async (req, res) => {
 
-const getCVById = async (req, res) => {
-  const { id } = req.params;
+  // Start database transaction
+  const client = await pool.connect();
+
   try {
-    const cv = await cvQueries.getCVById(id);
-    if (!cv) {
-      return res.status(404).json({ error: 'CV not found' });
+
+    // =====================================
+    // 1. Check CV file
+    // =====================================
+
+    if (!req.file) {
+
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload a CV file'
+      });
+
     }
-    res.json(cv);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch CV' });
-  }
-};
 
-const createCV = async (req, res) => {
-  const { name, email, phone, skills, experience } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ error: 'Name and email are required' });
-  }
-  try {
-    const cv = await cvQueries.createCV(name, email, phone, skills, experience);
-    res.status(201).json(cv);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to create CV' });
-  }
-};
 
-const updateCV = async (req, res) => {
-  const { id } = req.params;
-  const { name, email, phone, skills, experience } = req.body;
-  try {
-    const cv = await cvQueries.updateCV(id, name, email, phone, skills, experience);
-    if (!cv) {
-      return res.status(404).json({ error: 'CV not found' });
+    // =====================================
+    // 2. Get uploaded user
+    // =====================================
+
+    const { uploaded_by } = req.body;
+
+
+    if (!uploaded_by) {
+
+      return res.status(400).json({
+        success: false,
+        message: 'uploaded_by is required'
+      });
+
     }
-    res.json(cv);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to update CV' });
-  }
-};
 
-const deleteCV = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const cv = await cvQueries.deleteCV(id);
-    if (!cv) {
-      return res.status(404).json({ error: 'CV not found' });
+
+    // =====================================
+    // 3. Validate uploader exists
+    // =====================================
+
+    const uploaderResult = await pool.query(
+      'SELECT id FROM users WHERE id = $1',
+      [uploaded_by]
+    );
+
+    if (uploaderResult.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'uploaded_by user not found'
+      });
     }
-    res.json({ message: 'CV deleted successfully' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to delete CV' });
+
+
+    // =====================================
+    // 4. Start transaction
+    // =====================================
+
+    await client.query('BEGIN');
+
+
+    // =====================================
+    // 4. Create candidate automatically
+    // =====================================
+
+    const candidateResult = await client.query(
+      `
+      INSERT INTO candidates
+      (
+        name,
+        email,
+        created_by
+      )
+      VALUES
+      (
+        $1,
+        $2,
+        $3
+      )
+      RETURNING *
+      `,
+      [
+        req.file.originalname,
+        `candidate_${Date.now()}@temp.com`,
+        uploaded_by
+      ]
+    );
+
+
+    // Get generated candidate ID
+    const candidate =
+      candidateResult.rows[0];
+
+
+    // =====================================
+    // 5. Add CV information
+    // =====================================
+
+    const cvResult = await client.query(
+      `
+      INSERT INTO cv_files
+      (
+        candidate_id,
+        file_path,
+        file_name,
+        uploaded_by
+      )
+      VALUES
+      (
+        $1,
+        $2,
+        $3,
+        $4
+      )
+      RETURNING *
+      `,
+      [
+        candidate.id,
+        req.file.path,
+        req.file.originalname,
+        uploaded_by
+      ]
+    );
+
+
+    // =====================================
+    // 6. Commit transaction
+    // =====================================
+
+    await client.query('COMMIT');
+
+
+    // =====================================
+    // 7. Return success
+    // =====================================
+
+    return res.status(201).json({
+
+      success: true,
+
+      message:
+        'CV uploaded and candidate created successfully',
+
+      candidate: candidate,
+
+      cv: cvResult.rows[0]
+
+    });
+
+
+  } catch (error) {
+
+    // =====================================
+    // Rollback if error
+    // =====================================
+
+    await client.query('ROLLBACK');
+
+
+    console.error(
+      'CV Upload Error:',
+      error
+    );
+
+
+    return res.status(500).json({
+
+      success: false,
+
+      message: 'Failed to upload CV',
+
+      error: error.message
+
+    });
+
+
+  } finally {
+
+    // Release database connection
+    client.release();
+
   }
+
 };
 
-module.exports = { getAllCVs, getCVById, createCV, updateCV, deleteCV };
+
+module.exports = {
+  uploadCV
+};
