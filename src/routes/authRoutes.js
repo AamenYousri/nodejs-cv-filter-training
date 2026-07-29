@@ -1,16 +1,21 @@
-// routes/auth.routes.js
 const express = require('express');
 const router = express.Router();
-const { register, verifyOTP, login, resendOTP} = require('../controllers/authController');
+const { register, verifyOTP, resendOTP, forgotPassword, resetPassword, login } = require('../controllers/authController');
+const protect = require('../middleware/authMiddleware');
 
-// POST /auth/register
 router.post('/register', register);
-
-// POST /auth/verify-otp
 router.post('/verify-otp', verifyOTP);
-
+router.post('/resend-otp', resendOTP);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 router.post('/login', login);
 
-router.post('/resend-otp', resendOTP);
+router.get('/me', protect, (req, res) => {
+  res.json({
+    success: true,
+    message: 'You are authenticated!',
+    user: req.user,
+  });
+});
 
 module.exports = router;

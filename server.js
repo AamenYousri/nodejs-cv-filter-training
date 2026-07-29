@@ -9,16 +9,18 @@ app.use(express.json());
 
 const initDB = async () => {
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id            SERIAL PRIMARY KEY,
-      name          VARCHAR(100) NOT NULL,
-      email         VARCHAR(150) NOT NULL UNIQUE,
-      password_hash VARCHAR(255) NOT NULL,
-      created_at    TIMESTAMPTZ DEFAULT NOW(),
-      is_verified BOOLEAN NOT NULL DEFAULT FALSE,
-      OTP_CODE VARCHAR(6),
-      OTP_EXPIRY TIMESTAMPTZ
-    );
+CREATE TABLE IF NOT EXISTS users (
+  id            SERIAL PRIMARY KEY,
+  name          VARCHAR(100) NOT NULL,
+  email         VARCHAR(150) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  is_verified   BOOLEAN NOT NULL DEFAULT FALSE,
+  OTP_CODE      VARCHAR(255),
+  OTP_EXPIRY    TIMESTAMPTZ,
+  reset_code    VARCHAR(255),
+  reset_expiry  TIMESTAMPTZ
+);
 
     CREATE TABLE IF NOT EXISTS candidates (
       id                  SERIAL PRIMARY KEY,
@@ -72,5 +74,13 @@ app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+const PORT = process.env.PORT || 3000;
+if (require.main === module) {
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+}
 
 module.exports = app;
+
+
