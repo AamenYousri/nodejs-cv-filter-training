@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #0d1b2a url("images/generated-image (7).png") no-repeat center center / cover;
+  background: url("images/generated-image (7).png") no-repeat center center / cover;
   background-attachment: fixed;
   display: flex;
   justify-content: center;

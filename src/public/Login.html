@@ -1,72 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TalentGrid - Employer Login</title>
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-  <div class="login-card">
-    
-    <!-- Top Header Banner -->
-    <div class="card-header">
-      <div class="logo-box">
-        <img 
-      src="https://cdn.all-for-one.com/corporate-media/company/pr-und-news/bildarchiv/all-for-one-group-se-de-100424.png" 
-      alt="All For One Group Logo" 
-      class="brand-logo"
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalentGrid - Employer Login</title>
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-card">
+      <!-- Top Header Banner -->
+      <div class="card-header">
+        <div class="logo-box">
+          <img
+            src="https://cdn.all-for-one.com/corporate-media/company/pr-und-news/bildarchiv/all-for-one-group-se-de-100424.png"
+            alt="All For One Group Logo"
+            class="brand-logo"
+          />
+        </div>
+        <div class="header-text">
+          <span class="brand-title">TalentGrid</span>
+          <span class="brand-sub">HR SOLUTIONS</span>
+        </div>
       </div>
-      <div class="header-text">
-        <span class="brand-title">TalentGrid</span>
-        <span class="brand-sub">HR SOLUTIONS</span>
+
+      <!-- Main Form Content -->
+      <div class="card-body">
+        <h2 class="title">Welcome Back</h2>
+        <p class="subtitle">Login in to Your Employer Dashboard</p>
+
+        <form id="login-form">
+          <!-- Email Input -->
+          <div class="input-group">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input
+              type="email"
+              id="email"
+              placeholder="Email Address"
+              required
+            />
+          </div>
+
+          <!-- Password Input -->
+          <div class="input-group">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-regular fa-eye toggle-password"></i>
+          </div>
+
+          <!-- Remember Me & Forgot Password -->
+          <div class="form-options">
+            <label class="remember-me">
+              <input type="checkbox" id="remember" />
+              <span>Remember Me</span>
+            </label>
+            <a href="#" class="forgot-link">Forget Password?</a>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+
+        <!-- Sign Up Footer -->
+        <p class="signup-text">
+          Don't have an account? <a href="#">Sign up</a>
+        </p>
+
+        <p class="msg hidden" id="login-msg"></p>
       </div>
     </div>
-
-    <!-- Main Form Content -->
-    <div class="card-body">
-      <h2 class="title">Welcome Back</h2>
-      <p class="subtitle">Login in to Your Employer Dashboard</p>
-
-      <form id="login-form">
-        <!-- Email Input -->
-        <div class="input-group">
-          <i class="fa-regular fa-envelope input-icon"></i>
-          <input type="email" id="email" placeholder="Email Address" required />
-        </div>
-
-        <!-- Password Input -->
-        <div class="input-group">
-          <i class="fa-solid fa-lock input-icon"></i>
-          <input type="password" id="password" placeholder="Password" required />
-          <i class="fa-regular fa-eye toggle-password"></i>
-        </div>
-
-        <!-- Remember Me & Forgot Password -->
-        <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" id="remember" />
-            <span>Remember Me</span>
-          </label>
-          <a href="#" class="forgot-link">Forget Password?</a>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn-primary">Login</button>
-      </form>
-      
-      <!-- Sign Up Footer -->
-      <p class="signup-text">
-        Don't have an account? <a href="#">Sign up</a>
-      </p>
-
-      <p class="msg hidden" id="login-msg"></p>
-    </div>
-  </div>
-
-</body>
+  </body>
 </html>
