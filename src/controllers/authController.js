@@ -46,19 +46,18 @@ async function register(req, res) {
     const password_hash = await bcrypt.hash(password, 10);
 
     const otpCode = generateOTP();
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
+    const otpCodeHash = await bcrypt.hash(otpCode, 10);
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    const result = await pool.query(
-      `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, email, created_at, is_verified`,
-      [name, email, password_hash, otpCode, otpExpiresAt]
-    );
-
+const result = await pool.query(
+  `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
+   VALUES ($1, $2, $3, $4, $5)
+   RETURNING id, name, email, created_at, is_verified`,
+  [name, email, password_hash, otpCodeHash, otpExpiresAt]
+);
     const newUser = result.rows[0];
 
-    // Email to be sent to the user with the OTP code (this part is just a placeholder, you need to implement actual email sending)
-    
+    console.log(`OTP for ${newUser.email}: ${otpCode}`);
 
     return res.status(201).json({
       success: true,
@@ -107,14 +106,14 @@ async function verifyOTP(req, res) {
       });
     }
 
-    if (user.otp_code !== otp) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid OTP',
-      });
-    }
-
-    if (new Date() > new Date(user.otp_expires_at)) {
+const otpMatches = await bcrypt.compare(otp, user.otp_code);
+if (!otpMatches) {
+  return res.status(400).json({
+    success: false,
+    error: 'Invalid OTP',
+  });
+}
+    if (new Date() > new Date(user.otp_expiry)) {
       return res.status(400).json({
         success: false,
         error: 'OTP has expired',
@@ -142,7 +141,191 @@ async function verifyOTP(req, res) {
   }
 }
 
+async function resendOTP(req, res) {
+  try {
+    const { email } = req.body;
 
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'email is required',
+      });
+    }
+
+    const userResult = await pool.query(
+      'SELECT id, is_verified FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    if (user.is_verified) {
+      return res.status(400).json({
+        success: false,
+        error: 'User is already verified',
+      });
+    }
+
+    const otpCode = generateOTP();
+    const otpCodeHash = await bcrypt.hash(otpCode, 10);
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await pool.query(
+      `UPDATE users
+       SET otp_code = $1, otp_expiry = $2
+       WHERE id = $3`,
+      [otpCodeHash, otpExpiresAt, user.id]
+    );
+
+    console.log(`New OTP for ${email}: ${otpCode}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'A new OTP has been sent to your email.',
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      error: 'Something went wrong while resending OTP',
+    });
+  }
+}
+
+// جديد: بتولّد كود استرجاع باسورد وتحطه في reset_code / reset_expiry
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'email is required',
+      });
+    }
+
+    const userResult = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    // ملحوظة: مش بنرجع "user not found" هنا عمدًا (أمان) -
+    // عشان حد مايقدرش يعرف "هل الإيميل ده مسجل عندنا ولا لأ" بمجرد تجربة إيميلات عشوائية
+    if (userResult.rows.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset code has been sent.',
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    const resetCode = generateOTP();
+    const resetCodeHash = await bcrypt.hash(resetCode, 10);
+    const resetExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await pool.query(
+      `UPDATE users
+       SET reset_code = $1, reset_expiry = $2
+       WHERE id = $3`,
+      [resetCodeHash, resetExpiresAt, user.id]
+    );
+
+    // مؤقتاً هنطبعه في الـ console لحد ما نظبط إرسال الإيميل الفعلي
+    console.log(`Password reset code for ${email}: ${resetCode}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'If this email is registered, a reset code has been sent.',
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      error: 'Something went wrong while processing your request',
+    });
+  }
+}
+
+// جديد: بتتأكد من الكود وتحدّث الباسورد الجديد
+async function resetPassword(req, res) {
+  try {
+    const { email, resetCode, newPassword } = req.body;
+
+    if (!email || !resetCode || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'email, resetCode, and newPassword are required',
+      });
+    }
+
+    const userResult = await pool.query(
+      'SELECT id, reset_code, reset_expiry FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    const user = userResult.rows[0];
+
+if (!user.reset_code) {
+  return res.status(400).json({
+    success: false,
+    error: 'Invalid reset code',
+  });
+}
+
+const resetCodeMatches = await bcrypt.compare(resetCode, user.reset_code);
+if (!resetCodeMatches) {
+  return res.status(400).json({
+    success: false,
+    error: 'Invalid reset code',
+  });
+}
+
+    if (new Date() > new Date(user.reset_expiry)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Reset code has expired',
+      });
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    await pool.query(
+      `UPDATE users
+       SET password_hash = $1, reset_code = NULL, reset_expiry = NULL
+       WHERE id = $2`,
+      [newPasswordHash, user.id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully. You can now log in.',
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      error: 'Something went wrong while resetting your password',
+    });
+  }
+}
 
 const createAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '10d' });
@@ -150,17 +333,25 @@ const createAccessToken = (user) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-    const user = await authQueries.getUserByEmail(email);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    } else {
-        if (await bcrypt.compare(password, user.password_hash)) {
-            const token = createAccessToken(user);
-            res.json({ message: 'Login successful', accessToken: token });
-        } else {
-            res.status(401).json({ error: 'Invalid email or password' });
-        }
-    }
+
+  const user = await authQueries.getUserByEmail(email);
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  const passwordMatches = await bcrypt.compare(password, user.password_hash);
+  if (!passwordMatches) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  if (!user.is_verified) {
+    return res.status(403).json({
+      error: 'Please verify your email before logging in',
+    });
+  }
+
+  const token = createAccessToken(user);
+  res.json({ message: 'Login successful', accessToken: token });
 }
 
-module.exports = { register, verifyOTP, login };
+module.exports = { register, verifyOTP, resendOTP, forgotPassword, resetPassword, login };
