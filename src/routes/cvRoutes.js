@@ -1,28 +1,21 @@
-const express = require('express');
+const express = require("express");
 
-const upload = require('../middleware/multerMiddleware');
+const upload = require("../middleware/multerMiddleware");
 
-const {
-  uploadCV
-} = require('../controllers/cvController');
-
+const { uploadCV } = require("../controllers/cvController");
 
 const router = express.Router();
 
-
 // ==========================================
-// Upload CV
+// Upload CVs
 // ==========================================
 
 router.post(
+  "/upload",
 
-  '/upload',
+  upload.array("cv", 150),
 
-  upload.single('cv'),
-
-  uploadCV
-
+  uploadCV,
 );
-
 
 module.exports = router;
