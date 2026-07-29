@@ -9,6 +9,12 @@ function isCompanyEmail(email) {
   return email.toLowerCase().endsWith(`@${allowedDomain.toLowerCase()}`);
 }
 
+function generateAccessToken(user) {
+  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: '10d',
+  });
+}
+
 function generateOTP() {
   const otp = Math.floor(Math.random() * 1000000);
   return otp.toString().padStart(6, "0");
@@ -65,7 +71,7 @@ async function register(req, res) {
       success: true,
       message:
         "Registered successfully. Please verify your email using the OTP sent.",
-      data: newUser,
+        token: generateAccessToken(newUser),
     });
   } catch (err) {
     console.error(err);
