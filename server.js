@@ -60,26 +60,17 @@ initDB()
     process.exit(1);
   });
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
 app.use('/api/cvs', require('./src/routes/cvRoutes'));
-
 app.use('/api/auth', require('./src/routes/authRoutes'));
 
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-const PORT = process.env.PORT || 3000;
-if (require.main === module) {
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-}
 
 module.exports = app;
 

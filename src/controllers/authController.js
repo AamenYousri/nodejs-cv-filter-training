@@ -152,63 +152,6 @@ async function verifyOTP(req, res) {
   }
 }
 
-async function resendOTP(req, res) {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        error: "email is required",
-      });
-    }
-
-    const userResult = await pool.query(
-      "SELECT id, is_verified FROM users WHERE email = $1",
-      [email],
-    );
-
-    if (userResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: "User not found",
-      });
-    }
-
-    const user = userResult.rows[0];
-
-    if (user.is_verified) {
-      return res.status(400).json({
-        success: false,
-        error: "User is already verified",
-      });
-    }
-
-    const otpCode = generateOTP();
-    const otpCodeHash = await bcrypt.hash(otpCode, 10);
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    await pool.query(
-      `UPDATE users
-       SET otp_code = $1, otp_expiry = $2
-       WHERE id = $3`,
-      [otpCodeHash, otpExpiresAt, user.id],
-    );
-
-    console.log(`New OTP for ${email}: ${otpCode}`);
-
-    return res.status(200).json({
-      success: true,
-      message: "A new OTP has been sent to your email.",
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      success: false,
-      error: "Something went wrong while resending OTP",
-    });
-  }
-}
 
 const resendOTP = async (req, res) => {
   const { email } = req.body;
@@ -358,28 +301,6 @@ const createAccessToken = (user) => {
   });
 };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await authQueries.getUserByEmail(email);
-  if (!user) {
-    return res.status(401).json({ error: "Invalid email or password" });
-  }
-
-  const passwordMatches = await bcrypt.compare(password, user.password_hash);
-  if (!passwordMatches) {
-    return res.status(401).json({ error: "Invalid email or password" });
-  }
-
-  if (!user.is_verified) {
-    return res.status(403).json({
-      error: "Please verify your email before logging in",
-    });
-  }
-
-  const token = createAccessToken(user);
-  res.json({ message: "Login successful", accessToken: token });
-};
 
 const login = async (req, res) => {
 
