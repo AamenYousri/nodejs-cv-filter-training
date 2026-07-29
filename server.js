@@ -61,15 +61,32 @@ initDB()
   });
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'src', 'public')));
 
 // API routes
 app.use('/api/cvs', require('./src/routes/cvRoutes'));
 app.use('/api/auth', require('./src/routes/authRoutes'));
 
+// Frontend routes
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'Login.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'Register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'forget-password.html'));
+});
+
+app.get('/otp-verification', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'Otp.html'));
+});
+
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
 });
 
 module.exports = app;

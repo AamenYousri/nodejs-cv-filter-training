@@ -11,7 +11,7 @@ const mailerSend = new MailerSend({
 
 const sentFrom = new Sender(
   "noreply@test-ywj2lpnp7oqg7oqz.mlsender.net",
-  "CV Filter"
+  "TalentGrid"
 );
 
 const emailRecipient = (email, name) => {

@@ -9,6 +9,12 @@ function isCompanyEmail(email) {
   return email.toLowerCase().endsWith(`@${allowedDomain.toLowerCase()}`);
 }
 
+function generateAccessToken(user) {
+  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: '10d',
+  });
+}
+
 function generateOTP() {
   const otp = Math.floor(Math.random() * 1000000);
   return otp.toString().padStart(6, "0");
