@@ -316,17 +316,26 @@ const login = async (req, res) => {
         return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    else if (!user.is_verified) {
-      return res.status(403).json({ error: 'Email not verified. Please verify your email before logging in.' });
-    } 
+  const passwordMatches = await bcrypt.compare(password, user.password_hash);
+  if (!passwordMatches) {
+    return res.status(401).json({ error: "Invalid email or password" });
+  }
 
-        if (await bcrypt.compare(password, user.password_hash)) {
-            const token = createAccessToken(user);
-            res.json({ message: 'Login successful', accessToken: token });
-        } else {
-            res.status(401).json({ error: 'Invalid email or password' });
-        }
-    
-}
+  if (!user.is_verified) {
+    return res.status(403).json({
+      error: "Please verify your email before logging in",
+    });
+  }
 
-module.exports = { register, verifyOTP, login, resendOTP, forgotPassword, resetPassword };
+  const token = createAccessToken(user);
+  res.json({ message: "Login successful", accessToken: token });
+};
+
+module.exports = {
+  register,
+  verifyOTP,
+  resendOTP,
+  forgotPassword,
+  resetPassword,
+  login,
+};

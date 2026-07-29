@@ -3,6 +3,7 @@ const express = require('express');
 require('dotenv').config();
 const path = require('path');
 const pool = require('./src/db/index');
+
 const authRoutes = require('./src/routes/authRoutes');
 const app = express();
 app.use(express.json());

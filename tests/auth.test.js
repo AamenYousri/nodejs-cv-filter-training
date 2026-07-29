@@ -10,7 +10,6 @@ async function registerAndGetOTP(emailPrefix = "test") {
     .post("/api/auth/register")
     .send({ name: "Test User", email, password: "123456" });
 
-  // بندور جوه كل رسايل الـ console.log على السطر اللي فيه الـ OTP
   const otpLog = logSpy.mock.calls.find((call) =>
     call[0].includes(`OTP for ${email}`),
   );
