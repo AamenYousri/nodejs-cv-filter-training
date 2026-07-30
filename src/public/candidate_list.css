@@ -1,0 +1,159 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#f3f3f3;
+    padding:30px;
+}
+
+.table-container{
+    background:#fff;
+    border:2px solid #555;
+    border-radius:10px;
+    overflow:auto;
+}
+
+h2{
+    padding:18px;
+    border-bottom:2px solid #555;
+    font-size:32px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#efefef;
+}
+
+/* Keep header visible when scrolling, without covering the container border */
+thead th{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 2px; /* match container border thickness */
+    z-index: 3;
+    background: #efefef;
+}
+
+th{
+    text-align:left;
+    padding:12px 18px;
+    font-size:15px;
+    border-bottom:2px solid #bbb;
+    white-space:nowrap;
+}
+
+th i{
+    float:right;
+    font-size:12px;
+    color:#555;
+}
+
+td{
+    padding:10px 18px;
+    border-bottom:1px solid #ddd;
+    font-size:15px;
+}
+
+tbody tr:hover{
+    background:#fafafa;
+}
+
+/* Badges */
+
+.badge{
+    display:inline-block;
+    padding:4px 12px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:14px;
+    text-align:center;
+    min-width:80px;
+}
+
+.match{
+    background:#6fe38d;
+    border:1px solid #2d9f4d;
+}
+
+.average{
+    background:#f3f3f3;
+    border:1px solid #888;
+}
+
+.review{
+    background:#ffe98b;
+    border:1px solid #c6ae30;
+}
+
+.accepted{
+    background:#5fe07a;
+    border:1px solid #249642;
+}
+
+.rejected{
+    background:#f16262;
+    border:1px solid #b02020;
+}
+
+.done{
+    background:#e6e6e6;
+    border:1px solid #999;
+}
+
+/* Buttons */
+
+.actions{
+    white-space:nowrap;
+}
+
+.btn{
+    border:1px solid rgba(0,0,0,0.08);
+    border-radius:6px;
+    padding:6px 12px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    margin-right:6px;
+}
+
+.btn i{
+    margin-right:4px;
+}
+
+.cv{
+    background:#bdbdbd;
+}
+
+.accept{
+    background:#58d46f;
+}
+
+.reject{
+    background:#ef5a5a;
+}
+
+.email{
+    background:#8b8b8b;
+    color:white;
+}
+
+.btn:hover{
+    opacity:.9;
+}
+
+/* Sorted header visual state */
+table thead th.sorted{
+    background: #eaf6ff;
+    font-weight:700;
+}
+
+table thead th.sorted i{
+    color: #007bff;
+}

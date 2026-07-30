@@ -1,0 +1,174 @@
+// candidates-list.js
+// Dynamic candidates list with a modifiable array and simple API.
+
+(function () {
+  const tbody = document.getElementById('candidates-tbody');
+
+  let candidates = [
+    { id: 1, name: 'Ahmed Tarek', title: 'Software Developer', experience: '3 Years', city: 'Alexandria, Egypt', match: 95, status: 'Done', cvLink: '#', email: 'ahmed@example.com' },
+    { id: 2, name: 'Mohamed Ahmed', title: 'Software Developer', experience: '2 Years', city: 'Cairo, Egypt', match: 83, status: 'Review', cvLink: '#', email: 'mohamed@example.com' },
+    { id: 3, name: 'Aly Mohamed', title: 'Software Engineer', experience: '4 Years', city: 'Cairo, Egypt', match: 50, status: 'Accepted', cvLink: '#', email: 'aly@example.com' },
+  ];
+
+  function matchClass(score) {
+    if (score >= 90) return 'excellent';
+    return 'average';
+  }
+
+  function render() {
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    candidates.forEach((c) => {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td>${escapeHtml(c.name)}</td>
+        <td>${escapeHtml(c.title)}</td>
+        <td>${escapeHtml(c.experience)}</td>
+        <td>${escapeHtml(c.city)}</td>
+        <td><span class="badge match ${matchClass(c.match)}">${c.match}% Match</span></td>
+        <td><span class="badge ${statusClass(c.status)}">${escapeHtml(c.status)}</span></td>
+        <td class="actions"></td>
+      `;
+
+      const actionsTd = tr.querySelector('.actions');
+
+      // CV button
+      const cvBtn = createBtn('cv', 'fa-up-right-from-square', 'CV', () => {
+        if (c.cvLink) window.open(c.cvLink, '_blank');
+      });
+      actionsTd.appendChild(cvBtn);
+
+      // Accept/Reject buttons for review status
+      if (c.status === 'Review') {
+        const acceptBtn = createBtn('accept', 'fa-check', 'Accept', () => updateStatus(c.id, 'Accepted'));
+        const rejectBtn = createBtn('reject', 'fa-xmark', 'Reject', () => updateStatus(c.id, 'Rejected'));
+        actionsTd.appendChild(acceptBtn);
+        actionsTd.appendChild(rejectBtn);
+      }
+
+      // Email button
+      if (c.status !== 'Review' && c.status !== 'Done') {
+        const emailBtn = createBtn('email', 'fa-envelope', 'Send Email', () => {
+          window.location.href = `mailto:${encodeURIComponent(c.email)}`;
+        });
+        actionsTd.appendChild(emailBtn);
+      }
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function createBtn(cls, icon, text, onClick) {
+    const btn = document.createElement('button');
+    btn.className = `btn ${cls}`;
+    btn.innerHTML = `<i class="fa-solid ${icon}"></i> ${text}`;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+
+  function statusClass(status) {
+    const map = {
+      Review: 'review',
+      Accepted: 'accepted',
+      Rejected: 'rejected',
+      Done: 'done',
+    };
+    return map[status] || 'status';
+  }
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str).replace(/[&<>"']/g, function (s) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[s];
+    });
+  }
+
+  // Sorting state and helpers
+  const sortState = { index: null, direction: 'asc' }; // direction: 'asc' or 'desc'
+
+  function parseExperience(expStr) {
+    if (!expStr) return 0;
+    const m = String(expStr).match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  function compareByIndex(a, b, index) {
+    switch (index) {
+      case 0: // name
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      case 1: // title
+        return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+      case 2: // experience (numeric years)
+        return parseExperience(a.experience) - parseExperience(b.experience);
+      case 3: // city
+        return a.city.localeCompare(b.city, undefined, { sensitivity: 'base' });
+      case 4: // match (numeric)
+        return (a.match || 0) - (b.match || 0);
+      case 5: // status
+        return a.status.localeCompare(b.status, undefined, { sensitivity: 'base' });
+      default:
+        return 0;
+    }
+  }
+
+  function updateSortIcons(selectedIndex, direction) {
+    const ths = document.querySelectorAll('table thead th');
+    ths.forEach((th, i) => {
+      const icon = th.querySelector('i');
+      if (!icon) return;
+      icon.classList.remove('fa-chevron-up', 'fa-chevron-down');
+      if (i === selectedIndex) {
+        icon.classList.add(direction === 'asc' ? 'fa-chevron-up' : 'fa-chevron-down');
+        th.classList.add('sorted');
+      } else {
+        icon.classList.add('fa-chevron-down');
+        th.classList.remove('sorted');
+      }
+    });
+  }
+
+  function sortByColumn(index) {
+    if (sortState.index === index) {
+      sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortState.index = index;
+      sortState.direction = 'asc';
+    }
+
+    candidates.sort((a, b) => {
+      const res = compareByIndex(a, b, index);
+      return sortState.direction === 'asc' ? res : -res;
+    });
+
+    updateSortIcons(sortState.index, sortState.direction);
+    render();
+  }
+
+  function attachSortHandlers() {
+    const ths = document.querySelectorAll('table thead th');
+    ths.forEach((th, i) => {
+      const icon = th.querySelector('i');
+      if (!icon) return;
+      icon.style.cursor = 'pointer';
+      icon.addEventListener('click', (e) => {
+        e.preventDefault();
+        sortByColumn(i);
+      });
+    });
+  }
+
+  // Initial render and attach sort handlers
+  document.addEventListener('DOMContentLoaded', () => {
+    attachSortHandlers();
+    render();
+  });
+
+})();
