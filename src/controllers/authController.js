@@ -122,9 +122,8 @@ async function verifyOTP(req, res) {
         error: "User is already verified",
       });
     }
-
-    const otpMatches = await bcrypt.compare(otp, user.otp_code);
-    if (!otpMatches) {
+;
+    if (otp !== user.otp_code) {
       return res.status(400).json({
         success: false,
         error: "Invalid OTP",
