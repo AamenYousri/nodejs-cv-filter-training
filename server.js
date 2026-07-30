@@ -1,11 +1,12 @@
 // server.js
-const express = require('express');
-require('dotenv').config();
-const path = require('path');
-const pool = require('./src/db/index');
-const authRoutes = require('./src/routes/authRoutes');
+const express = require("express");
+require("dotenv").config();
+const path = require("path");
+const pool = require("./src/db/index");
+const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 app.use(express.json());
+const cors = require("cors");
 
 const initDB = async () => {
   await pool.query(`
@@ -24,8 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
 
     CREATE TABLE IF NOT EXISTS candidates (
       id                  SERIAL PRIMARY KEY,
-      name                VARCHAR(150) NOT NULL,
-      email               VARCHAR(150) NOT NULL,
+      name                VARCHAR(150),
+      email               VARCHAR(150),
       city                VARCHAR(100),
       job_title           VARCHAR(150),
       years_of_experience INTEGER,
@@ -44,7 +45,7 @@ CREATE TABLE IF NOT EXISTS users (
       uploaded_at  TIMESTAMPTZ DEFAULT NOW()
     );
   `);
-  console.log('Database tables ready.');
+  console.log("Database tables ready.");
 };
 
 const PORT = process.env.PORT || 3000;
@@ -56,16 +57,17 @@ initDB()
     });
   })
   .catch((err) => {
-    console.error('Database initialization failed:', err);
+    console.error("Database initialization failed:", err);
     process.exit(1);
   });
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
+app.use(cors());
 
 // API routes
-app.use('/api/cvs', require('./src/routes/cvRoutes'));
-app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use("/api/cvs", require("./src/routes/cvRoutes"));
+app.use("/api/auth", require("./src/routes/authRoutes"));
 
 // Frontend routes
 app.get('/login', (req, res) => {
@@ -89,6 +91,14 @@ app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
 });
 
+app.use("/api/uploads", express.static("uploads"));
+
+const cvRoutes = require("./src/routes/cvRoutes");
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use("/api/cv", cvRoutes);
+
 module.exports = app;
-
-
