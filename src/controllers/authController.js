@@ -84,7 +84,7 @@ async function register(req, res) {
 
 function regenerateOTP(user) {
   const otpCode = generateOTP();
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
   return pool.query(
     `UPDATE users SET OTP_CODE = $1, OTP_EXPIRY = $2 WHERE id = $3 RETURNING *`,
     [otpCode, otpExpiresAt, user.id]
@@ -193,8 +193,6 @@ async function forgotPassword(req, res) {
       [email],
     );
 
-    // ملحوظة: مش بنرجع "user not found" هنا عمدًا (أمان) -
-    // عشان حد مايقدرش يعرف "هل الإيميل ده مسجل عندنا ولا لأ" بمجرد تجربة إيميلات عشوائية
     if (userResult.rows.length === 0) {
       return res.status(200).json({
         success: true,
@@ -215,7 +213,6 @@ async function forgotPassword(req, res) {
       [resetCodeHash, resetExpiresAt, user.id],
     );
 
-    // مؤقتاً هنطبعه في الـ console لحد ما نظبط إرسال الإيميل الفعلي
     console.log(`Password reset code for ${email}: ${resetCode}`);
 
     return res.status(200).json({
@@ -321,17 +318,26 @@ const login = async (req, res) => {
         return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    else if (!user.is_verified) {
-      return res.status(403).json({ error: 'Email not verified. Please verify your email before logging in.' });
-    } 
+  const passwordMatches = await bcrypt.compare(password, user.password_hash);
+  if (!passwordMatches) {
+    return res.status(401).json({ error: "Invalid email or password" });
+  }
 
-        if (await bcrypt.compare(password, user.password_hash)) {
-            const token = createAccessToken(user);
-            res.json({ message: 'Login successful', accessToken: token });
-        } else {
-            res.status(401).json({ error: 'Invalid email or password' });
-        }
-    
-}
+  if (!user.is_verified) {
+    return res.status(403).json({
+      error: "Please verify your email before logging in",
+    });
+  }
 
-module.exports = { register, verifyOTP, login, resendOTP, forgotPassword, resetPassword };
+  const token = createAccessToken(user);
+  res.json({ message: "Login successful", accessToken: token });
+};
+
+module.exports = {
+  register,
+  verifyOTP,
+  resendOTP,
+  forgotPassword,
+  resetPassword,
+  login,
+};

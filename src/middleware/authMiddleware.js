@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
 function protect(req, res, next) {
   const authHeader = req.headers.authorization; 
 
@@ -15,7 +18,11 @@ function protect(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+<<<<<<< HEAD
+    req.user = decoded; 
+=======
     req.user = decoded;
+>>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
     next();
   } catch (err) {
     return res.status(401).json({

@@ -13,7 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+<<<<<<< HEAD
+    "bootstrap": "^5.3.8",
+=======
     "cors": "^2.8.6",
+>>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "fuse.js": "^7.5.0",

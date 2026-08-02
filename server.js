@@ -3,6 +3,10 @@ const express = require("express");
 require("dotenv").config();
 const path = require("path");
 const pool = require("./src/db/index");
+<<<<<<< HEAD
+
+=======
+>>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
 const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 app.use(express.json());
@@ -72,12 +76,22 @@ initDB()
   });
 
 app.use(express.urlencoded({ extended: true }));
+<<<<<<< HEAD
+app.use(express.static(path.join(__dirname, "src", "public" )));
+=======
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 app.use(cors());
+>>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
 
 // API routes
 app.use("/api/cvs", require("./src/routes/cvRoutes"));
 app.use("/api/auth", require("./src/routes/authRoutes"));
+<<<<<<< HEAD
+
+// Serve the UI for any other route
+app.get("/{*path}", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "public", "html", "sidebar-test.html"));
+=======
 
 // Frontend routes
 app.get('/login', (req, res) => {
@@ -99,6 +113,7 @@ app.get('/otp-verification', (req, res) => {
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
+>>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
 });
 
 app.use("/api/uploads", express.static("uploads"));
