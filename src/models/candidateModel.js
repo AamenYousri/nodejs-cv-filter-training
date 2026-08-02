@@ -182,7 +182,26 @@ const getCandidates = async ({
 
 };
 
+// ======================================================
+// Delete Candidate
+// ======================================================
+
+const deleteCandidateById = async (id) => {
+
+  const query = `
+    DELETE FROM candidates
+    WHERE id = $1
+    RETURNING id
+  `;
+
+  const result = await pool.query(query, [id]);
+
+  return result.rows[0];
+
+};
+
 
 module.exports = {
-  getCandidates
+  getCandidates,
+  deleteCandidateById 
 };

@@ -1,36 +1,78 @@
 const pool = require('./index');
+const logger = require('../utils/logger');
 
-const getAllCVs = async () => {
-  const result = await pool.query('SELECT * FROM cvs ORDER BY created_at DESC');
-  return result.rows;
-};
+class CVRepository {
+  constructor(dbPool, dbLogger) {
+    this.pool = dbPool;
+    this.logger = dbLogger;
+  }
 
-const getCVById = async (id) => {
-  const result = await pool.query('SELECT * FROM cvs WHERE id = $1', [id]);
-  return result.rows[0];
-};
+  async getAllCVs() {
+    try {
+      const query = `
+        SELECT
+          cv_files.id           AS cv_id,
+          cv_files.file_name,
+          cv_files.file_path,
+          candidates.id         AS candidate_id,
+          candidates.name       AS candidate_name,
+          candidates.status,
+          candidates.created_at
+        FROM cv_files
+        JOIN candidates ON cv_files.candidate_id = candidates.id
+        ORDER BY candidates.created_at DESC
+      `;
 
-const createCV = async (name, email, phone, skills, experience) => {
-  const result = await pool.query(
-    `INSERT INTO cvs (name, email, phone, skills, experience)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [name, email, phone || null, skills || null, experience || null]
-  );
-  return result.rows[0];
-};
+      const result = await this.pool.query(query);
+      this.logger.info('CVRepository: fetched all CVs.', { count: result.rows.length });
+      return result.rows;
+    } catch (error) {
+      this.logger.error('CVRepository: failed to fetch all CVs.', { error: error.message });
+      throw error;
+    }
+  }
 
-const updateCV = async (id, name, email, phone, skills, experience) => {
-  const result = await pool.query(
-    `UPDATE cvs SET name=$1, email=$2, phone=$3, skills=$4, experience=$5
-     WHERE id=$6 RETURNING *`,
-    [name, email, phone || null, skills || null, experience || null, id]
-  );
-  return result.rows[0];
-};
+  async getCVById(cvId) {
+    try {
+      const query = `
+        SELECT
+          cv_files.id           AS cv_id,
+          cv_files.file_name,
+          cv_files.file_path,
+          candidates.id         AS candidate_id,
+          candidates.name       AS candidate_name,
+          candidates.status,
+          candidates.created_at
+        FROM cv_files
+        JOIN candidates ON cv_files.candidate_id = candidates.id
+        WHERE cv_files.id = $1
+      `;
 
-const deleteCV = async (id) => {
-  const result = await pool.query('DELETE FROM cvs WHERE id = $1 RETURNING id', [id]);
-  return result.rows[0];
-};
+      const result = await this.pool.query(query, [cvId]);
+      this.logger.info('CVRepository: fetched CV by id.', { cvId, found: !!result.rows[0] });
+      return result.rows[0];
+    } catch (error) {
+      this.logger.error('CVRepository: failed to fetch CV by id.', { cvId, error: error.message });
+      throw error;
+    }
+  }
 
-module.exports = { getAllCVs, getCVById, createCV, updateCV, deleteCV };
+  async deleteCandidate(candidateId) {
+    try {
+      const query = `
+        DELETE FROM candidates
+        WHERE id = $1
+        RETURNING id
+      `;
+
+      const result = await this.pool.query(query, [candidateId]);
+      this.logger.info('CVRepository: deleted candidate.', { candidateId, deleted: !!result.rows[0] });
+      return result.rows[0];
+    } catch (error) {
+      this.logger.error('CVRepository: failed to delete candidate.', { candidateId, error: error.message });
+      throw error;
+    }
+  }
+}
+
+module.exports = new CVRepository(pool, logger);
