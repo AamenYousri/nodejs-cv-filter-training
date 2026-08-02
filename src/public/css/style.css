@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: url("images/generated-image (7).png") no-repeat center center / cover;
+  background: url("../images/generated-image (7).png") no-repeat center center / cover;
   background-attachment: fixed;
   display: flex;
   justify-content: center;
@@ -235,6 +235,22 @@ body {
 
 .signup-text a:hover {
   text-decoration: underline;
+}
+
+.msg {
+  display: block;
+  margin-top: 14px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.msg.error {
+  color: #dc2626;
+}
+
+.msg.success {
+  color: #15803d;
 }
 
 .hidden {

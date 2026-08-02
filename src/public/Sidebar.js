@@ -2,15 +2,18 @@ class TokenStorage {
   static #KEY = 'accessToken';
 
   static get() {
-    return localStorage.getItem(TokenStorage.#KEY);
+    const match = document.cookie.match(
+      new RegExp('(?:^|; )' + TokenStorage.#KEY.replace(/([.$?*|{}\(\)\[\]\\/\+\^])/g, '\\$1') + '=([^;]*)')
+    );
+    return match ? decodeURIComponent(match[1]) : null;
   }
 
   static set(token) {
-    localStorage.setItem(TokenStorage.#KEY, token);
+    document.cookie = `${TokenStorage.#KEY}=${encodeURIComponent(token)}; path=/; max-age=${10 * 24 * 60 * 60}; SameSite=Lax`;
   }
 
   static clear() {
-    localStorage.removeItem(TokenStorage.#KEY);
+    document.cookie = `${TokenStorage.#KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
   }
 }
 
@@ -64,16 +67,6 @@ class Sidebar {
     Sidebar.#instances.push(this);
   }
 
-  /**
-   * نقطة الدخول الموحدة لأي صفحة: بتنشئ نسخ السايدبار، بترندرها،
-   * وبتربط سلوك الـ offcanvas toggle مرة واحدة بس مهما كان عدد النسخ.
-   *
-   * Usage:
-   * Sidebar.init([
-   *   { containerId: 'desktop-sidebar', userService, tokenStorage: TokenStorage },
-   *   { containerId: 'mobile-sidebar',  userService, tokenStorage: TokenStorage },
-   * ]);
-   */
   static init(configs) {
     const instances = configs.map(
       (cfg) => new Sidebar(cfg.containerId, cfg.userService, cfg.tokenStorage)
@@ -157,7 +150,7 @@ class Sidebar {
     logoutBtn.addEventListener('click', (event) => {
       event.preventDefault();
       this.tokenStorage.clear();
-      window.location.href = '/html/login.html';
+      window.location.href = '/login';
     });
   }
 
@@ -178,7 +171,11 @@ class Sidebar {
     const user = await this.userService.getCurrentUser(token);
     const nameEl = this.container.querySelector('#sidebar-user-name');
     if (nameEl) {
-      nameEl.textContent = user ? user.email : 'Guest';
+      nameEl.textContent = user ? user.name : 'Guest';
     }
   }
 }
+
+window.TokenStorage = TokenStorage;
+window.UserService = UserService;
+window.Sidebar = Sidebar;

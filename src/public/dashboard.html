@@ -1,19 +1,21 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sidebar Test</title>
-  <link
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentGrid - Dashboard</title>
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="../css/sidebar.css" />
 </head>
 <body>
+    <div class="dashboard-container">
+        <div class="main-sidebar-container">
 
-<!-- Mobile Button -->
-<button
+            <button
     class="btn sidebar-toggle d-lg-none"
     type="button"
     data-bs-toggle="offcanvas"
@@ -30,16 +32,7 @@
 </div>
 
 <!-- Mobile Sidebar -->
-<div
-    class="offcanvas offcanvas-start p-0"
-    tabindex="-1"
-    id="mobileSidebar">
 
-    <div
-        id="mobile-sidebar"
-        data-active-page="dashboard">
-    </div>
-</div>
 
 <!-- Content -->
 
@@ -49,7 +42,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-<script src="../Sidebar.js"></script>
+<script src="./Sidebar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const { UserService, TokenStorage, Sidebar } = window;
@@ -95,5 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+</body>
+
+        </div>
+        <div class="main-content-container">
+            aaaahadhahdf
+        </div>
+    </div>
 </body>
 </html>

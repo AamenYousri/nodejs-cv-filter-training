@@ -10,9 +10,11 @@ function isCompanyEmail(email) {
 }
 
 function generateAccessToken(user) {
-  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: '10d',
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, name: user.name, is_verified: Boolean(user.is_verified) },
+    process.env.JWT_SECRET,
+    { expiresIn: '10d' }
+  );
 }
 
 function generateOTP() {
@@ -67,11 +69,20 @@ async function register(req, res) {
     await sendOTPEmail(newUser);
     
 
+    const token = generateAccessToken(newUser);
+
+    res.cookie('accessToken', token, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(201).json({
       success: true,
       message:
         "Registered successfully. Please verify your email using the OTP sent.",
-        token: generateAccessToken(newUser),
+      token,
     });
   } catch (err) {
     console.error(err);
@@ -144,9 +155,20 @@ async function verifyOTP(req, res) {
       [user.id],
     );
 
+    const verifiedUser = { ...user, is_verified: true };
+    const newToken = generateAccessToken(verifiedUser);
+
+    res.cookie('accessToken', newToken, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Email verified successfully",
+      token: newToken,
     });
   } catch (err) {
     console.error(err);
@@ -298,9 +320,11 @@ async function resetPassword(req, res) {
 }
 
 const createAccessToken = (user) => {
-  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: "10d",
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, name: user.name, is_verified: Boolean(user.is_verified) },
+    process.env.JWT_SECRET,
+    { expiresIn: "10d" }
+  );
 };
 
 
@@ -330,6 +354,14 @@ const login = async (req, res) => {
   }
 
   const token = createAccessToken(user);
+
+  res.cookie('accessToken', token, {
+    httpOnly: false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 10 * 24 * 60 * 60 * 1000,
+  });
+
   res.json({ message: "Login successful", accessToken: token });
 };
 
