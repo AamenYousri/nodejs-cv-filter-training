@@ -6,6 +6,8 @@ const { uploadCV } = require("../controllers/cvController");
 
 const router = express.Router();
 
+
+
 // ==========================================
 // Upload CVs
 // ==========================================
@@ -19,3 +21,9 @@ router.post(
 );
 
 module.exports = router;
+
+
+
+
+
+
