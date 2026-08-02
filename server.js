@@ -78,6 +78,16 @@ app.use(cors());
 // API routes
 app.use("/api/cvs", require("./src/routes/cvRoutes"));
 app.use("/api/auth", require("./src/routes/authRoutes"));
+app.use("/api/skills", require("./src/routes/skillRoutes"));
+
+const cvRoutes = require("./src/routes/cvRoutes");
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use("/api/cv", cvRoutes);
+app.use("/api/candidates", require("./src/routes/candidateRoutes"));
 
 // Frontend routes
 app.get('/login', (req, res) => {
@@ -96,23 +106,16 @@ app.get('/otp-verification', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'Otp.html'));
 });
 
-// Serve the UI for any other route
-app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
-});
-
 app.use("/api/uploads", express.static("uploads"));
 
-const cvRoutes = require("./src/routes/cvRoutes");
+// Serve the UI for any other route
+app.get(/.*/, (req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
 
-// ==========================================
-// CV Routes
-// ==========================================
-
-app.use("/api/cv", cvRoutes);
+  return res.sendFile(path.join(__dirname, 'src', 'public', 'filter-and-search.html'));
+});
 
 module.exports = app;
-
-
-
 
