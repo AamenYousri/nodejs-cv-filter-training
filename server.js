@@ -8,6 +8,16 @@ const app = express();
 app.use(express.json());
 const cors = require("cors");
 
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid JSON payload. Check escaped backslashes in file paths.",
+    });
+  }
+  return next(err);
+});
+
 const initDB = async () => {
   await pool.query(`
 CREATE TABLE IF NOT EXISTS users (
@@ -62,16 +72,33 @@ initDB()
   });
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'src', 'public')));
 app.use(cors());
 
 // API routes
 app.use("/api/cvs", require("./src/routes/cvRoutes"));
 app.use("/api/auth", require("./src/routes/authRoutes"));
 
+// Frontend routes
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'Login.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'Register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'forget-password.html'));
+});
+
+app.get('/otp-verification', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'Otp.html'));
+});
+
 // Serve the UI for any other route
-app.get("/{*path}", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+app.get('/{*path}', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
 });
 
 app.use("/api/uploads", express.static("uploads"));

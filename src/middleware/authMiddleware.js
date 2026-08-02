@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-// الـ middleware ده بيتحط قبل أي route عايزة تكون محمية (يعني محتاجة login)
+
 function protect(req, res, next) {
-  const authHeader = req.headers.authorization; // المتوقع: "Bearer <token>"
+  const authHeader = req.headers.authorization; 
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
@@ -15,7 +15,7 @@ function protect(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // بقى متاح في أي route جاي بعد كده: req.user.id, req.user.email
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({

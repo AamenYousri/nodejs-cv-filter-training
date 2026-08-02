@@ -1,26 +1,8 @@
-const {
-  MailerSend,
-  EmailParams,
-  Sender,
-  Recipient
-} = require("mailersend");
+const { Resend } = require('resend');
 
-const mailerSend = new MailerSend({
-  apiKey: process.env.MAILER_SEND,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sentFrom = new Sender(
-  "noreply@test-ywj2lpnp7oqg7oqz.mlsender.net",
-  "CV Filter"
-);
-
-const emailRecipient = (email, name) => {
-  return [new Recipient(email, name)];
-};
-
-const sendOTPEmail = async (user) => {
-  console.log(user)
-    const html =`
+const emailHtml = (user) => `
     <div style="font-family: Helvetica, sans-serif; text-align: center; padding: 20px; background-color: #4c76bf; border-radius: 10px; border-bottom: 5px solid #2c3e50; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <img style="
         max-width: 300px;
@@ -40,19 +22,15 @@ const sendOTPEmail = async (user) => {
     </div>
     `
 
-  const emailParams = new EmailParams()
-  .setFrom(sentFrom)
-  .setTo(emailRecipient(user.email, user.name))
-  .setSubject("TalentGrid - OTP Verification")
-  .setHtml(html)
-  .setText(`Your OTP code is: ${user.otp_code}`);
+const sendOTPEmail = async (user) => {
+  
+   /* await resend.emails.send({
+    from: "onboarding@resend.dev",
+    to: "angrytv7@gmail.com",
+    subject: "TalentGrid - Your OTP Code",
+    html: emailHtml(user),
+  }); */
 
-try {
-    const response = await mailerSend.email.send(emailParams);
-    console.log("OTP email sent successfully:", response);
-} catch (error) {
-    console.error(error);
-}
 }
 
 module.exports = { sendOTPEmail };
