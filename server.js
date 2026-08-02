@@ -62,7 +62,7 @@ initDB()
   });
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "src", "public")));
+app.use(express.static(path.join(__dirname, "src", "public" )));
 
 // API routes
 app.use("/api/cvs", require("./src/routes/cvRoutes"));
@@ -70,7 +70,7 @@ app.use("/api/auth", require("./src/routes/authRoutes"));
 
 // Serve the UI for any other route
 app.get("/{*path}", (req, res) => {
-  res.sendFile(path.join(__dirname, "src", "public", "index.html"));
+  res.sendFile(path.join(__dirname, "src", "public", "html", "sidebar-test.html"));
 });
 
 module.exports = app;
