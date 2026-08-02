@@ -22,7 +22,7 @@ const uploadCV = async (req, res) => {
     // 2. Get uploaded user
     // =====================================
 
-    const { uploaded_by } = req.body;
+    const uploaded_by = req.user.id;
 
     if (!uploaded_by) {
       return res.status(400).json({
@@ -60,6 +60,8 @@ const uploadCV = async (req, res) => {
       // =====================================
       // 4. Create candidate automatically
       // =====================================
+
+      
 
       const candidateResult = await client.query(
         `

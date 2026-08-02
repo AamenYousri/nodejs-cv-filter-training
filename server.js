@@ -8,6 +8,16 @@ const app = express();
 app.use(express.json());
 const cors = require("cors");
 
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid JSON payload. Check escaped backslashes in file paths.",
+    });
+  }
+  return next(err);
+});
+
 const initDB = async () => {
   await pool.query(`
 CREATE TABLE IF NOT EXISTS users (

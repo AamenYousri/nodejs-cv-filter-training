@@ -80,6 +80,7 @@ tbody tr:hover{
 .match{
     background:#6fe38d;
     border:1px solid #2d9f4d;
+    min-width:100px;
 }
 
 .average{
