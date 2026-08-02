@@ -7,6 +7,8 @@ const extractCvData = require("../controllers/cvDataExtraction/cvData");
 
 const router = express.Router();
 
+
+
 // ==========================================
 // Upload CVs
 // ==========================================
@@ -41,3 +43,9 @@ router.post("/extract", protect, async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+
+
