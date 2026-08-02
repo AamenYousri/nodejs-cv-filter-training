@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates List</title>
+    <link rel="stylesheet" href="candidate_list.css">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+</head>
+<body>
+
+<div class="table-container">
+
+    <h2>Candidates List</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Name <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Job Title <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Experience <i class="fa-solid fa-chevron-down"></i></th>
+                <th>City <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Match Score <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Status <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="candidates-tbody">
+            <!-- Rows will be rendered dynamically by candidates-list.js -->
+        </tbody>
+
+    </table>
+
+</div>
+
+<script src="candidates-list.js"></script>
+
+</body>
+</html>

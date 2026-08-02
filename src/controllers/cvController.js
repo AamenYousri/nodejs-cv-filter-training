@@ -1,4 +1,5 @@
 const pool = require("../db/index");
+const extractCvData = require("./cvDataExtraction/cvData");
 
 const uploadCV = async (req, res) => {
   // Start database transaction
@@ -22,7 +23,7 @@ const uploadCV = async (req, res) => {
     // 2. Get uploaded user
     // =====================================
 
-    const { uploaded_by } = req.body;
+    const uploaded_by = req.user.id;
 
     if (!uploaded_by) {
       return res.status(400).json({
@@ -61,23 +62,33 @@ const uploadCV = async (req, res) => {
       // 4. Create candidate automatically
       // =====================================
 
+      const cvData = await extractCvData(file.path);
+
       const candidateResult = await client.query(
         `
         INSERT INTO candidates
         (
           name,
           email,
-          created_by
+          created_by,
+          job_title,
+          city,
+          years_of_experience,
+          skills
         )
         VALUES
         (
           $1,
           $2,
-          $3
+          $3,
+          $4,
+          $5,
+          $6,
+          $7
         )
         RETURNING *
         `,
-        [file.originalname, `candidate_${Date.now()}@temp.com`, uploaded_by],
+        [cvData.name, cvData.email, uploaded_by, cvData.jobTitle ? cvData.jobTitle.raw : null, cvData.city, String(Math.floor(cvData.yearsOfExperience)), cvData.skills],
       );
 
       const candidate = candidateResult.rows[0];
