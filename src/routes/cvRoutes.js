@@ -3,6 +3,7 @@ const upload = require("../middleware/multerMiddleware");
 const protect = require("../middleware/authMiddleware");
 const { uploadCV } = require("../controllers/cvController");
 const extractCvData = require("../controllers/cvDataExtraction/cvData");
+const cvLibraryController = require("../controllers/cvLibraryController");
 const router = express.Router();
 
 router.post(
@@ -11,6 +12,15 @@ router.post(
   upload.array("cv", 150),
   uploadCV,
 );
+
+// ======================================================
+// GET /api/cvs/library
+// ------------------------------------------------------
+// Returns the CV Library table data (filename, document
+// type, candidate name, status, date...). All the logic
+// lives in CvLibraryController -> Service -> Repository.
+// ======================================================
+router.get("/library", protect, cvLibraryController.getLibrary);
 
 router.post("/extract", protect, async (req, res) => {
   try {
