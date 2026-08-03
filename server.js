@@ -214,6 +214,20 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
+
+
+app.use("/api/uploads", express.static("uploads"));
+
+const cvRoutes = require("./src/routes/cvRoutes");
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use("/api/cv", cvRoutes);
+
+app.use("/api/candidates", require("./src/routes/candidateRoutes"))
+
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
   const tokenPayload = getTokenPayload(req);

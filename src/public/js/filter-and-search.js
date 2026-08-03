@@ -1,52 +1,200 @@
-/* ==========================================
-   GET ALL FILTERS
-========================================== */
-
-const filters = document.querySelectorAll(".multi-filter");
-
-/* ==========================================
-   SELECTED FILTERS
-========================================== */
+﻿const filters = document.querySelectorAll(".multi-filter");
 
 const selectedFilters = {
   city: [],
-
   jobTitle: [],
-
   experience: [],
-
   skills: [],
 };
 
-/* ==========================================
-   CANDIDATE SEARCH
-========================================== */
-
 const candidateSearch = document.getElementById("candidateSearch");
 
-/* ==========================================
-   INITIALIZE FILTERS
-========================================== */
+function getTableCellValueByFilter(filterName, row) {
+  if (!row) return "";
+
+  const cells = row.querySelectorAll("td");
+
+  switch (filterName) {
+    case "city":
+      return cells[3]?.textContent?.trim() || "";
+    case "jobTitle":
+      return cells[1]?.textContent?.trim() || "";
+    case "experience":
+      return cells[2]?.textContent?.trim() || "";
+    default:
+      return "";
+  }
+}
+
+function getAvailableFilterValues(filterName) {
+  const rows = document.querySelectorAll("#candidates-tbody tr");
+  const values = [];
+
+  rows.forEach((row) => {
+    const value = getTableCellValueByFilter(filterName, row);
+    if (value && !values.includes(value)) {
+      values.push(value);
+    }
+  });
+
+  return values.sort((a, b) => a.localeCompare(b));
+}
+
+function renderFilterOptionsFromRows() {
+  filters.forEach((filter) => {
+    const filterName = filter.dataset.filter;
+    const optionsList = filter.querySelector(".options-list");
+
+    if (!optionsList) return;
+
+    if (filterName === "skills") {
+      optionsList.innerHTML = "";
+      return;
+    }
+
+    const selected = selectedFilters[filterName] || [];
+    const availableValues = getAvailableFilterValues(filterName);
+    const values = [...new Set([...availableValues, ...selected])].sort((a, b) =>
+      a.localeCompare(b),
+    );
+
+    optionsList.innerHTML = "";
+
+    if (!values.length) {
+      const message = document.createElement("div");
+      message.className = "no-results";
+      message.textContent = "No available values";
+      optionsList.appendChild(message);
+      return;
+    }
+
+    values.forEach((value) => {
+      const option = document.createElement("div");
+      option.className = "option";
+      option.textContent = value;
+
+      if (selected.some((item) => item.toLowerCase() === value.toLowerCase())) {
+        option.classList.add("selected");
+      }
+
+      option.addEventListener("click", (event) => {
+        event.stopPropagation();
+        addValue(filterName, value, filter);
+
+        const dropdownSearch = filter.querySelector(".dropdown-search input");
+        if (dropdownSearch) {
+          dropdownSearch.value = "";
+        }
+
+        filterOptions(filter, "");
+      });
+
+      optionsList.appendChild(option);
+    });
+  });
+}
+
+function addValue(filterName, value, filter) {
+  if (!selectedFilters[filterName]) {
+    selectedFilters[filterName] = [];
+  }
+
+  const alreadyExists = selectedFilters[filterName].some(
+    (item) => item.toLowerCase() === value.toLowerCase(),
+  );
+
+  if (alreadyExists) return;
+
+  selectedFilters[filterName].push(value);
+  renderSelectedValues(filterName, filter);
+
+  if (filterName !== "skills") {
+    renderFilterOptionsFromRows();
+  }
+}
+
+function renderSelectedValues(filterName, filter) {
+  const container = filter.querySelector(".selected-items");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  (selectedFilters[filterName] || []).forEach((value) => {
+    const tag = document.createElement("div");
+    tag.className = "selected-tag";
+    tag.innerHTML = `
+      <span>${value}</span>
+      <button type="button" class="remove-tag" title="Remove ${value}">×</button>
+    `;
+
+    const removeButton = tag.querySelector(".remove-tag");
+    removeButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      removeValue(filterName, value, filter);
+    });
+
+    container.appendChild(tag);
+  });
+
+  updateSelectedOptions(filterName, filter);
+}
+
+function removeValue(filterName, value, filter) {
+  selectedFilters[filterName] = (selectedFilters[filterName] || []).filter(
+    (item) => item.toLowerCase() !== value.toLowerCase(),
+  );
+
+  renderSelectedValues(filterName, filter);
+
+  if (filterName !== "skills") {
+    renderFilterOptionsFromRows();
+  }
+}
+
+function updateSelectedOptions(filterName, filter) {
+  const options = filter.querySelectorAll(".option");
+
+  options.forEach((option) => {
+    const value = option.textContent.trim();
+    const isSelected = (selectedFilters[filterName] || []).some(
+      (item) => item.toLowerCase() === value.toLowerCase(),
+    );
+
+    option.classList.toggle("selected", isSelected);
+  });
+}
+
+function filterOptions(filter, searchValue) {
+  const options = filter.querySelectorAll(".option");
+  let found = false;
+
+  options.forEach((option) => {
+    const value = option.textContent.trim().toLowerCase();
+    const shouldShow = value.includes(searchValue);
+    option.style.display = shouldShow ? "block" : "none";
+    if (shouldShow) found = true;
+  });
+
+  const oldMessage = filter.querySelector(".no-results");
+  if (oldMessage) oldMessage.remove();
+
+  if (!found) {
+    const message = document.createElement("div");
+    message.className = "no-results";
+    message.textContent = "No results found";
+    filter.querySelector(".options-list").appendChild(message);
+  }
+}
 
 filters.forEach((filter) => {
   const filterName = filter.dataset.filter;
-
   const filterInput = filter.querySelector(".filter-input");
-
   const mainInput = filter.querySelector(".multi-input");
-
   const dropdownSearch = filter.querySelector(".dropdown-search input");
+  const optionsList = filter.querySelector(".options-list");
 
-  const options = filter.querySelectorAll(".option");
-
-  /* ======================================
-       OPEN DROPDOWN
-    ====================================== */
-
-  filterInput.addEventListener("click", function (event) {
+  filterInput.addEventListener("click", (event) => {
     event.stopPropagation();
-
-    /* Close other dropdowns */
 
     filters.forEach((otherFilter) => {
       if (otherFilter !== filter) {
@@ -54,234 +202,63 @@ filters.forEach((filter) => {
       }
     });
 
-    /* Open current dropdown */
-
     filter.classList.add("open");
   });
 
-  /* ======================================
-       WRITE CUSTOM VALUE
+  if (filterName === "skills") {
+  mainInput.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
 
-       Value DOES NOT have to exist
-       in the predefined list.
-    ====================================== */
+    event.preventDefault();
 
-  mainInput.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
+    const value = mainInput.value.trim();
+
+    if (!value) return;
+
+    addValue(filterName, value, filter);
+
+    mainInput.value = "";
+  });
+} else {
+    mainInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+
       event.preventDefault();
 
       const value = mainInput.value.trim();
+      const validValues = getAvailableFilterValues(filterName);
 
-      /* Add ANY value */
-
-      if (value !== "") {
+      if (value && validValues.some((item) => item.toLowerCase() === value.toLowerCase())) {
         addValue(filterName, value, filter);
       }
 
-      /* Clear input */
-
       mainInput.value = "";
-    }
-  });
-
-  /* ======================================
-       SELECT FROM LIST
-    ====================================== */
-
-  options.forEach((option) => {
-    option.addEventListener("click", function (event) {
-      event.stopPropagation();
-
-      const value = option.textContent.trim();
-
-      addValue(filterName, value, filter);
-
-      /* Clear dropdown search */
-
-      dropdownSearch.value = "";
-
-      /* Show all options */
-
-      filterOptions(filter, "");
     });
-  });
-
-  /* ======================================
-       SEARCH INSIDE DROPDOWN
-    ====================================== */
+  }
 
   dropdownSearch.addEventListener("input", function () {
     const searchValue = this.value.toLowerCase().trim();
-
     filterOptions(filter, searchValue);
   });
+
+  if (filterName === "skills") {
+    optionsList.innerHTML = "";
+  }
 });
 
-/* ==========================================
-   ADD VALUE
-========================================== */
-
-function addValue(filterName, value, filter) {
-  /* Prevent duplicate values */
-
-  const alreadyExists = selectedFilters[filterName].some(
-    (item) => item.toLowerCase() === value.toLowerCase(),
-  );
-
-  if (alreadyExists) {
-    return;
-  }
-
-  /* Add value */
-
-  selectedFilters[filterName].push(value);
-
-  /* Update UI */
-
-  renderSelectedValues(filterName, filter);
-
-  console.log("Selected Filters:", selectedFilters);
-}
-
-/* ==========================================
-   RENDER SELECTED VALUES
-========================================== */
-
-function renderSelectedValues(filterName, filter) {
-  const container = filter.querySelector(".selected-items");
-
-  /* Clear tags */
-
-  container.innerHTML = "";
-
-  /* Create tags */
-
-  selectedFilters[filterName].forEach((value) => {
-    const tag = document.createElement("div");
-
-    tag.className = "selected-tag";
-
-    tag.innerHTML = `
-
-                <span>
-                    ${value}
-                </span>
-
-                <button
-                    type="button"
-                    class="remove-tag"
-                    title="Remove ${value}"
-                >
-                    ×
-                </button>
-
-            `;
-
-    /* Remove button */
-
-    const removeButton = tag.querySelector(".remove-tag");
-
-    removeButton.addEventListener("click", function (event) {
-      event.stopPropagation();
-
-      removeValue(filterName, value, filter);
-    });
-
-    /* Add tag */
-
-    container.appendChild(tag);
+const candidatesTableBody = document.getElementById("candidates-tbody");
+if (candidatesTableBody) {
+  const observer = new MutationObserver(() => {
+    renderFilterOptionsFromRows();
   });
 
-  /* Update predefined options */
-
-  updateSelectedOptions(filterName, filter);
-}
-
-/* ==========================================
-   REMOVE VALUE
-========================================== */
-
-function removeValue(filterName, value, filter) {
-  selectedFilters[filterName] = selectedFilters[filterName].filter(
-    (item) => item.toLowerCase() !== value.toLowerCase(),
-  );
-
-  /* Re-render */
-
-  renderSelectedValues(filterName, filter);
-
-  console.log("Removed:", value);
-}
-
-/* ==========================================
-   UPDATE SELECTED OPTIONS
-========================================== */
-
-function updateSelectedOptions(filterName, filter) {
-  const options = filter.querySelectorAll(".option");
-
-  options.forEach((option) => {
-    const value = option.textContent.trim();
-
-    const isSelected = selectedFilters[filterName].some(
-      (item) => item.toLowerCase() === value.toLowerCase(),
-    );
-
-    if (isSelected) {
-      option.classList.add("selected");
-    } else {
-      option.classList.remove("selected");
-    }
+  observer.observe(candidatesTableBody, {
+    childList: true,
+    subtree: true,
   });
 }
 
-/* ==========================================
-   FILTER DROPDOWN OPTIONS
-========================================== */
-
-function filterOptions(filter, searchValue) {
-  const options = filter.querySelectorAll(".option");
-
-  let found = false;
-
-  options.forEach((option) => {
-    const value = option.textContent.trim().toLowerCase();
-
-    if (value.includes(searchValue)) {
-      option.style.display = "block";
-
-      found = true;
-    } else {
-      option.style.display = "none";
-    }
-  });
-
-  /* Remove old message */
-
-  const oldMessage = filter.querySelector(".no-results");
-
-  if (oldMessage) {
-    oldMessage.remove();
-  }
-
-  /* Show no results */
-
-  if (!found) {
-    const message = document.createElement("div");
-
-    message.className = "no-results";
-
-    message.textContent = "No results found";
-
-    filter.querySelector(".options-list").appendChild(message);
-  }
-}
-
-/* ==========================================
-   CLOSE DROPDOWNS
-========================================== */
-
-document.addEventListener("click", function (event) {
+document.addEventListener("click", (event) => {
   filters.forEach((filter) => {
     if (!filter.contains(event.target)) {
       filter.classList.remove("open");
@@ -289,115 +266,70 @@ document.addEventListener("click", function (event) {
   });
 });
 
-/* ==========================================
-   APPLY FILTER BUTTON
-========================================== */
-
 const applyFilterBtn = document.getElementById("applyFilterBtn");
+if (applyFilterBtn) {
+  applyFilterBtn.addEventListener("click", function () {
+    const filtersToApply = {
+      search: candidateSearch ? candidateSearch.value.trim() : "",
+      city: [...selectedFilters.city],
+      jobTitle: [...selectedFilters.jobTitle],
+      experience: [...selectedFilters.experience],
+      skills: [...selectedFilters.skills],
+    };
 
-applyFilterBtn.addEventListener("click", function () {
-  /* Get search text */
+    console.log("==============================");
+    console.log("APPLY FILTER");
+    const filtered = window.filterCandidates(filtersToApply);
 
-  const searchValue = candidateSearch.value.trim();
-
-  /* Create final filter object */
-
-  const filtersToApply = {
-    search: searchValue,
-
-    city: [...selectedFilters.city],
-
-    jobTitle: [...selectedFilters.jobTitle],
-
-    experience: [...selectedFilters.experience],
-
-    skills: [...selectedFilters.skills],
-  };
-
-  /* =================================
-           RESULT
-        ================================= */
-
-  console.log("==============================");
-
-  console.log("APPLY FILTER");
-
-  console.log(filtersToApply);
-
-  console.log("==============================");
-
-  /*
-            Later connect this object
-            to your Fuse.js function.
-
-            Example:
-
-            filterCandidates(
-                filtersToApply
-            );
-        */
-});
-
-/* ==========================================
-   CLEAR ALL FILTERS
-========================================== */
+    window.renderCandidates(filtered);
+    console.log("==============================");
+  });
+}
 
 const clearFilterBtn = document.getElementById("clearFilterBtn");
+if (clearFilterBtn) {
+  clearFilterBtn.addEventListener("click", function () {
+    selectedFilters.city = [];
+    selectedFilters.jobTitle = [];
+    selectedFilters.experience = [];
+    selectedFilters.skills = [];
 
-clearFilterBtn.addEventListener("click", function () {
-  /* Clear selected filters */
+    if (candidateSearch) {
+      candidateSearch.value = "";
+    }
 
-  selectedFilters.city = [];
+    filters.forEach((filter) => {
+      const filterName = filter.dataset.filter;
+      renderSelectedValues(filterName, filter);
 
-  selectedFilters.jobTitle = [];
+      const mainInput = filter.querySelector(".multi-input");
+      if (mainInput) {
+        mainInput.value = "";
+      }
 
-  selectedFilters.experience = [];
+      const dropdownSearch = filter.querySelector(".dropdown-search input");
+      if (dropdownSearch) {
+        dropdownSearch.value = "";
+      }
 
-  selectedFilters.skills = [];
+      if (filterName !== "skills") {
+        renderFilterOptionsFromRows();
+      }
 
-  /* Clear candidate search */
+      filter.classList.remove("open");
+    });
 
-  candidateSearch.value = "";
+    
+    window.resetCandidates();
 
-  /* Reset all filters */
-
-  filters.forEach((filter) => {
-    const filterName = filter.dataset.filter;
-
-    /* Re-render */
-
-    renderSelectedValues(filterName, filter);
-
-    /* Clear main input */
-
-    const mainInput = filter.querySelector(".multi-input");
-
-    mainInput.value = "";
-
-    /* Clear dropdown search */
-
-    const dropdownSearch = filter.querySelector(".dropdown-search input");
-
-    dropdownSearch.value = "";
-
-    /* Show all options */
-
-    filterOptions(filter, "");
-
-    /* Close dropdown */
-
-    filter.classList.remove("open");
   });
+}
 
-  console.log("All filters cleared");
-});
+if (candidateSearch) {
+  candidateSearch.addEventListener("input", function () {
+    console.log("Candidate Search:", this.value.trim());
+  });
+}
 
-/* ==========================================
-   CANDIDATE SEARCH
-========================================== */
-
-candidateSearch.addEventListener("input", function () {
-  const searchValue = this.value.trim();
-
-  console.log("Candidate Search:", searchValue);
-});
+renderFilterOptionsFromRows();
+window.renderFilterOptionsFromRows = renderFilterOptionsFromRows;
