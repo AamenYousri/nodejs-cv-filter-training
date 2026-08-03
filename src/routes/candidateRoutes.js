@@ -1,4 +1,5 @@
 const express = require('express');
+const protect = require("../middleware/authMiddleware");
 
 const {
   getAllCandidates
@@ -9,7 +10,7 @@ const router = express.Router();
 
 
 router.get(
-  '/',
+  '/', protect,
   getAllCandidates
 );
 

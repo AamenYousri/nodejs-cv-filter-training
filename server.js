@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS users (
       job_title           VARCHAR(150),
       years_of_experience INTEGER,
       skills              TEXT[],
-      status              VARCHAR(50) DEFAULT 'Pending',
+      status              VARCHAR(50) DEFAULT 'Review',
       created_by          INTEGER NOT NULL REFERENCES users(id),
       created_at          TIMESTAMPTZ DEFAULT NOW()
     );
@@ -193,6 +193,20 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
+
+
+app.use("/api/uploads", express.static("uploads"));
+
+const cvRoutes = require("./src/routes/cvRoutes");
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use("/api/cv", cvRoutes);
+
+app.use("/api/candidates", require("./src/routes/candidateRoutes"))
+
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
   const tokenPayload = getTokenPayload(req);
@@ -207,16 +221,6 @@ app.get('/{*path}', (req, res) => {
 
   res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
-
-app.use("/api/uploads", express.static("uploads"));
-
-const cvRoutes = require("./src/routes/cvRoutes");
-
-// ==========================================
-// CV Routes
-// ==========================================
-
-app.use("/api/cv", cvRoutes);
 
 module.exports = app;
 

@@ -1,6 +1,6 @@
 const {
   getCandidates
-} = require('../models/candidateModel');
+} = require("../models/candidateModel");
 
 
 // ======================================================
@@ -19,6 +19,7 @@ const getAllCandidates = async (req, res) => {
       max_experience
     } = req.query;
 
+    const created_by = req.user.id;
 
     // ==================================================
     // Multiple Skills
@@ -26,13 +27,10 @@ const getAllCandidates = async (req, res) => {
 
     let skills = req.query.skills;
 
-
     if (skills) {
 
       if (!Array.isArray(skills)) {
-
         skills = [skills];
-
       }
 
     } else {
@@ -41,28 +39,27 @@ const getAllCandidates = async (req, res) => {
 
     }
 
-
     // ==================================================
     // Get Candidates
     // ==================================================
 
-    const candidates =
-      await getCandidates({
+    const candidates = await getCandidates({
 
-        search,
+      created_by,
 
-        skills,
+      search,
 
-        city,
+      skills,
 
-        job_title,
+      city,
 
-        min_experience,
+      job_title,
 
-        max_experience
+      min_experience,
 
-      });
+      max_experience
 
+    });
 
     return res.status(200).json({
 
@@ -74,31 +71,23 @@ const getAllCandidates = async (req, res) => {
 
     });
 
-
   } catch (error) {
 
-    console.error(
-      'Candidates Error:',
-      error
-    );
-
+    console.error("Candidates Error:", error);
 
     return res.status(500).json({
 
       success: false,
 
-      message:
-        'Failed to get candidates',
+      message: "Failed to get candidates",
 
-      error:
-        error.message
+      error: error.message
 
     });
 
   }
 
 };
-
 
 module.exports = {
   getAllCandidates

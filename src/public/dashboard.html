@@ -9,7 +9,11 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
+  
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="candidate_list.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+<link rel="stylesheet" href="filter-and-search.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -33,6 +37,16 @@
 
 <!-- Mobile Sidebar -->
 
+<div
+    class="offcanvas offcanvas-start p-0"
+    tabindex="-1"
+    id="mobileSidebar">
+
+    <div
+        id="mobile-sidebar"
+        data-active-page="dashboard">
+    </div>
+</div>
 
 <!-- Content -->
 
@@ -92,8 +106,413 @@ document.addEventListener('DOMContentLoaded', () => {
 
         </div>
         <div class="main-content-container">
-            aaaahadhahdf
+            <div class="dashboard-filteration">
+              <div class="filter-section">
+      <!-- =================================
+         HEADER
+    ================================== -->
+
+      <div class="filter-header">
+        <!-- Filter Title -->
+
+        <div class="filter-title">
+          <span>Filter</span>
+
+          <i class="fa-solid fa-filter"></i>
+        </div>
+
+        <!-- Search Candidates -->
+
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input
+            type="text"
+            id="candidateSearch"
+            placeholder="Search candidates..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <!-- =================================
+         FILTERS
+    ================================== -->
+
+      <div class="filters-container">
+        <!-- =================================
+             CITY
+        ================================== -->
+
+        <div class="multi-filter" data-filter="city">
+          <div class="filter-input">
+            <i class="fa-solid fa-location-dot filter-icon"></i>
+
+            <!-- Selected Values -->
+
+            <div class="selected-items"></div>
+
+            <!-- Write Custom Value -->
+
+            <input
+              type="text"
+              class="multi-input"
+              placeholder="City"
+              autocomplete="off"
+            />
+
+            <i class="fa-solid fa-chevron-down arrow"></i>
+          </div>
+
+          <!-- City Dropdown -->
+
+          <div class="dropdown">
+            <!-- Dropdown Search -->
+
+            <div class="dropdown-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                placeholder="Search or write city..."
+                autocomplete="off"
+              />
+            </div>
+
+            <!-- City List -->
+
+            <div class="options-list">
+              <div class="option">Alexandria</div>
+
+              <div class="option">Cairo</div>
+
+              <div class="option">Giza</div>
+
+              <div class="option">Mansoura</div>
+
+              <div class="option">Tanta</div>
+
+              <div class="option">Aswan</div>
+
+              <div class="option">Ismailia</div>
+
+              <div class="option">Port Said</div>
+
+              <div class="option">Suez</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================
+             JOB TITLE
+        ================================== -->
+
+        <div class="multi-filter" data-filter="jobTitle">
+          <div class="filter-input">
+            <i class="fa-solid fa-briefcase filter-icon"></i>
+
+            <!-- Selected Values -->
+
+            <div class="selected-items"></div>
+
+            <!-- Write Custom Value -->
+
+            <input
+              type="text"
+              class="multi-input"
+              placeholder="Job Title"
+              autocomplete="off"
+            />
+
+            <i class="fa-solid fa-chevron-down arrow"></i>
+          </div>
+
+          <!-- Job Title Dropdown -->
+
+          <div class="dropdown">
+            <!-- Dropdown Search -->
+
+            <div class="dropdown-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                placeholder="Search or write job title..."
+                autocomplete="off"
+              />
+            </div>
+
+            <!-- Job Title List -->
+
+            <div class="options-list">
+              <div class="option">Software Developer</div>
+
+              <div class="option">Software Engineer</div>
+
+              <div class="option">Frontend Developer</div>
+
+              <div class="option">Backend Developer</div>
+
+              <div class="option">Full Stack Developer</div>
+
+              <div class="option">DevOps Engineer</div>
+
+              <div class="option">Mobile Developer</div>
+
+              <div class="option">Data Scientist</div>
+
+              <div class="option">Data Analyst</div>
+
+              <div class="option">QA Engineer</div>
+
+              <div class="option">UI/UX Designer</div>
+
+              <div class="option">System Administrator</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================
+             EXPERIENCE
+        ================================== -->
+
+        <div class="multi-filter" data-filter="experience">
+          <div class="filter-input">
+            <i class="fa-regular fa-clock filter-icon"></i>
+
+            <!-- Selected Values -->
+
+            <div class="selected-items"></div>
+
+            <!-- Write Custom Value -->
+
+            <input
+              type="text"
+              class="multi-input"
+              placeholder="Experience"
+              autocomplete="off"
+            />
+
+            <i class="fa-solid fa-chevron-down arrow"></i>
+          </div>
+
+          <!-- Experience Dropdown -->
+
+          <div class="dropdown">
+            <!-- Dropdown Search -->
+
+            <div class="dropdown-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                placeholder="Search or write experience..."
+                autocomplete="off"
+              />
+            </div>
+
+            <!-- Experience List -->
+
+            <div class="options-list">
+              <div class="option">Fresh Graduate</div>
+
+              <div class="option">Internship</div>
+
+              <div class="option">Less than 1 Year</div>
+
+              <div class="option">1 Year</div>
+
+              <div class="option">2 Years</div>
+
+              <div class="option">3 Years</div>
+
+              <div class="option">4 Years</div>
+
+              <div class="option">5+ Years</div>
+
+              <div class="option">10+ Years</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================
+             SKILLS
+        ================================== -->
+
+        <div class="multi-filter" data-filter="skills">
+          <div class="filter-input">
+            <i class="fa-solid fa-code filter-icon"></i>
+
+            <!-- Selected Values -->
+
+            <div class="selected-items"></div>
+
+            <!-- Write Custom Value -->
+
+            <input
+              type="text"
+              class="multi-input"
+              placeholder="Skills"
+              autocomplete="off"
+            />
+
+            <i class="fa-solid fa-chevron-down arrow"></i>
+          </div>
+
+          <!-- Skills Dropdown -->
+
+          <div class="dropdown">
+            <!-- Dropdown Search -->
+
+            <div class="dropdown-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                placeholder="Search or write skill..."
+                autocomplete="off"
+              />
+            </div>
+
+            <!-- Skills List -->
+
+            <div class="options-list">
+              <div class="option">JavaScript</div>
+
+              <div class="option">TypeScript</div>
+
+              <div class="option">React</div>
+
+              <div class="option">Angular</div>
+
+              <div class="option">Vue.js</div>
+
+              <div class="option">Node.js</div>
+
+              <div class="option">Express.js</div>
+
+              <div class="option">Python</div>
+
+              <div class="option">Django</div>
+
+              <div class="option">Java</div>
+
+              <div class="option">Spring Boot</div>
+
+              <div class="option">C#</div>
+
+              <div class="option">.NET</div>
+
+              <div class="option">PHP</div>
+
+              <div class="option">Laravel</div>
+
+              <div class="option">Flutter</div>
+
+              <div class="option">Kotlin</div>
+
+              <div class="option">Docker</div>
+
+              <div class="option">Kubernetes</div>
+
+              <div class="option">Linux</div>
+
+              <div class="option">AWS</div>
+
+              <div class="option">Azure</div>
+
+              <div class="option">Git</div>
+
+              <div class="option">GitHub</div>
+
+              <div class="option">Jenkins</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================
+         BUTTONS
+    ================================== -->
+
+      <div class="filter-actions">
+        <!-- Filter Button -->
+
+        <button type="button" id="applyFilterBtn" class="apply-filter-btn">
+          <i class="fa-solid fa-filter"></i>
+
+          Filter
+        </button>
+
+        <!-- Clear Button -->
+
+        <button type="button" id="clearFilterBtn" class="clear-filter-btn">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+
+    <script src="filter-and-search.js"></script>
+            </div>
+            <div class="dashboard-candidate-table-container">
+
+    <h2 class="dashboard-candidate-title">Candidates List</h2>
+
+    <table class="dashboard-candidate-table">
+
+        <thead>
+            <tr>
+                <th>Name <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Job Title <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Experience <i class="fa-solid fa-chevron-down"></i></th>
+                <th>City <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Match Score <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Status <i class="fa-solid fa-chevron-down"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="candidates-tbody">
+            <!-- Rows will be rendered dynamically by candidates-list.js -->
+        </tbody>
+
+    </table>
+
+</div>
+
+<script src="candidates-list.js"></script>
+        </div>
+
+    </div>
+
+    <div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Upload CVs</h2>
+            <button id="closeUploadModal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+
+            <input
+                type="file"
+                id="cvFiles"
+                accept=".pdf,.doc,.docx"
+                multiple
+            >
+
+            <div id="selectedFiles"></div>
+
+            <button id="uploadCvBtn" class="btn primary">
+                Upload
+            </button>
+
         </div>
     </div>
+</div>
+<script src="upload-modal.js"></script>
+
 </body>
 </html>
