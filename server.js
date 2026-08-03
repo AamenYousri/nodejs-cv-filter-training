@@ -144,7 +144,7 @@ app.get('/login', (req, res) => {
     return res.redirect('/dashboard');
   }
 
-  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'Login.html'));
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'login.html'));
 });
 
 app.get('/register', (req, res) => {
@@ -158,7 +158,7 @@ app.get('/register', (req, res) => {
     return res.redirect('/dashboard');
   }
 
-  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'Register.html'));
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'register.html'));
 });
 
 app.get('/forgot-password', (req, res) => {
