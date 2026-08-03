@@ -63,7 +63,8 @@
 
         <!-- Sign Up Footer -->
         <p class="signup-text">
-          Don’t receive a code? <a href="#">Resend Code</a>
+          Don’t receive a code?
+          <a href="#" id="resend-otp-link">Resend Code</a>
         </p>
 
         <p class="msg hidden" id="login-msg"></p>
@@ -76,6 +77,7 @@
         const otpInput = document.getElementById('otp');
         const messageEl = document.getElementById('login-msg');
         const emailTextEl = document.getElementById('email-text');
+        const resendLink = document.getElementById('resend-otp-link');
 
         function getCookie(name) {
           const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}\(\)\[\]\\/\+\^])/g, '\\$1') + '=([^;]*)'));
@@ -107,6 +109,48 @@
           messageEl.textContent = text;
           messageEl.classList.remove('hidden', 'error', 'success');
           messageEl.classList.add(type);
+        }
+
+        async function resendOTP() {
+          const token = getCookie('accessToken');
+          const email = decodeJwtEmail(token);
+
+          if (!email) {
+            showMessage('Your session is missing. Please log in again.');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/auth/resend-otp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              showMessage(data?.error || 'Unable to resend OTP. Please try again.');
+              return;
+            }
+
+            showMessage('A new OTP has been sent to your email.', 'success');
+            if (resendLink) {
+              resendLink.textContent = 'Sent';
+              resendLink.style.pointerEvents = 'none';
+              resendLink.style.opacity = '0.7';
+            }
+          } catch (error) {
+            console.error('Resend OTP error:', error);
+            showMessage('Something went wrong while resending the OTP.');
+          }
+        }
+
+        if (resendLink) {
+          resendLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            resendOTP();
+          });
         }
 
         otpForm.addEventListener('submit', async (event) => {

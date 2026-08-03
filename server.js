@@ -195,6 +195,16 @@ app.get('/dashboard', (req, res) => {
 
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
+  const tokenPayload = getTokenPayload(req);
+
+  if (!tokenPayload) {
+    return res.redirect('/login');
+  }
+
+  if (tokenPayload.is_verified === false) {
+    return res.redirect('/otp-verification');
+  }
+
   res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
