@@ -8,6 +8,10 @@ const extractCvData = require("../controllers/cvDataExtraction/cvData");
 const cvLibraryController = require("../controllers/cvLibraryController");
 const router = express.Router();
 
+// ==========================================
+// Upload CVs
+// ==========================================
+
 router.post(
   "/upload",
   protect,
@@ -40,8 +44,13 @@ router.post("/extract", protect, async (req, res) => {
     return res.json({ success: true, data: cvData });
   } catch (error) {
     console.error("Error extracting CV data:", error);
-    return res.status(500).json({ success: false, message: "Error extracting CV data" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Error extracting CV data" });
   }
 });
+const { getAllLibraryCVs } = require("../controllers/cvController");
+
+router.get("/getLibraryCVs", getAllLibraryCVs);
 
 module.exports = router;
