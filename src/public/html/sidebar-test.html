@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sidebar Test</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="../css/sidebar.css" />
+</head>
+<body>
+
+<!-- Mobile Button -->
+<button
+    class="btn sidebar-toggle d-lg-none"
+    type="button"
+    data-bs-toggle="offcanvas"
+    data-bs-target="#mobileSidebar">
+
+    <i class="fa-solid fa-bars"></i>
+</button>
+
+<!-- Desktop Sidebar -->
+<div
+    id="desktop-sidebar"
+    class="d-none d-lg-block"
+    data-active-page="dashboard">
+</div>
+
+<!-- Mobile Sidebar -->
+<div
+    class="offcanvas offcanvas-start p-0"
+    tabindex="-1"
+    id="mobileSidebar">
+
+    <div
+        id="mobile-sidebar"
+        data-active-page="dashboard">
+    </div>
+</div>
+
+<!-- Content -->
+
+<div id="sidebar-container"
+     data-active-page="dashboard">
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="../Sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const { UserService, TokenStorage, Sidebar } = window;
+
+  if (!UserService || !TokenStorage || !Sidebar) {
+    console.error('Sidebar dependencies are not loaded.');
+    return;
+  }
+
+  const userService = new UserService();
+
+  const desktopSidebar = new Sidebar('desktop-sidebar', userService, TokenStorage);
+  const mobileSidebar = new Sidebar('mobile-sidebar', userService, TokenStorage);
+
+  desktopSidebar.render();
+  mobileSidebar.render();
+
+  const mobileSidebarEl = document.getElementById('mobileSidebar');
+  const toggleBtn = document.querySelector('.sidebar-toggle');
+
+  if (!mobileSidebarEl || !toggleBtn) return;
+
+  mobileSidebarEl.addEventListener('shown.bs.offcanvas', () => {
+    toggleBtn.classList.add('open');
+  });
+
+  mobileSidebarEl.addEventListener('hidden.bs.offcanvas', () => {
+    toggleBtn.classList.remove('open');
+    toggleBtn.blur();
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (window.innerWidth >= 992 && window.bootstrap) {
+        const offcanvasInstance = bootstrap.Offcanvas.getInstance(mobileSidebarEl);
+        if (offcanvasInstance) {
+          offcanvasInstance.hide();
+        }
+      }
+    }, 150);
+  });
+});
+</script>
+</body>
+</html>

@@ -9,9 +9,51 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body>
+    <script>
+      function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}\(\)\[\]\\/\+\^])/g, '\\$1') + '=([^;]*)'));
+        return match ? decodeURIComponent(match[1]) : null;
+      }
+
+      function clearInvalidToken() {
+        document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      }
+
+      function decodeJwtPayload(token) {
+        if (!token) return null;
+
+        try {
+          const payload = token.split('.')[1];
+          const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+          const decoded = JSON.parse(atob(normalized));
+
+          if (!decoded || !decoded.email) {
+            return null;
+          }
+
+          return decoded;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      const token = getCookie('accessToken');
+      if (token) {
+        const payload = decodeJwtPayload(token);
+
+        if (!payload) {
+          clearInvalidToken();
+        } else if (payload.is_verified === false) {
+          window.location.href = '/otp-verification';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      }
+    </script>
+
     <div class="login-card">
       <!-- Top Header Banner -->
       <div class="card-header">
@@ -78,5 +120,7 @@
         <p class="msg hidden" id="login-msg"></p>
       </div>
     </div>
+
+    <script src="../css/login.js"></script>
   </body>
 </html>
