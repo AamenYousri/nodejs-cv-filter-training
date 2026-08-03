@@ -135,11 +135,6 @@ body {
   color: #121c2d !important;
 }
 
-.main-content-container {
-  margin-left: var(--sidebar-width);
-  transition: margin-left 0.3s ease;
-  padding: 20px;
-}
 
 @media (max-width: 991px) {
   .sidebar-toggle {

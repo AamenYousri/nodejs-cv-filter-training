@@ -6,6 +6,7 @@ const pool = require('../db/index');
 // ======================================================
 
 const getCandidates = async ({
+  created_by,
   search,
   skills,
   city,
@@ -39,11 +40,20 @@ const getCandidates = async ({
     WHERE 1 = 1
   `;
 
+ 
 
   const values = [];
 
   let parameterIndex = 1;
 
+
+   query += `
+  AND c.created_by = $${parameterIndex}
+`;
+
+  values.push(created_by);
+
+  parameterIndex++;
 
   // ======================================================
   // Search

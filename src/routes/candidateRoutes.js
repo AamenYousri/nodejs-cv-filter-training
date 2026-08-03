@@ -1,7 +1,14 @@
-const express = require("express");
+const express = require('express');
+const protect = require("../middleware/authMiddleware");
+
+const {
+  getAllCandidates
+} = require('../controllers/candidateController');
+
+
 const router = express.Router();
 const candidateController = require("../controllers/candidateController");
-const protect = require("../middleware/authMiddleware");
+
 const candidateStatusController = require("../controllers/candidateStatusController");
 
 const getCandidatesHandler =
@@ -11,6 +18,10 @@ const getCandidatesHandler =
         res.status(501).json({ success: false, message: "getAllCandidates is not implemented yet." });
       };
 
+router.get(
+  '/', protect,
+  getAllCandidates
+);
 const deleteCandidateHandler =
   typeof candidateController.deleteCandidate === "function"
     ? candidateController.deleteCandidate
