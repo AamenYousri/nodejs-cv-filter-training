@@ -4,7 +4,6 @@ require("dotenv").config();
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const pool = require("./src/db/index");
-
 const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 app.use(express.json());
@@ -121,6 +120,16 @@ app.use(cors());
 // API routes
 app.use("/api/cvs", require("./src/routes/cvRoutes"));
 app.use("/api/auth", require("./src/routes/authRoutes"));
+app.use("/api/skills", require("./src/routes/skillRoutes"));
+
+const cvRoutes = require("./src/routes/cvRoutes");
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use("/api/cv", cvRoutes);
+app.use("/api/candidates", require("./src/routes/candidateRoutes"));
 
 // Frontend routes
 app.get('/login', (req, res) => {
@@ -134,7 +143,7 @@ app.get('/login', (req, res) => {
     return res.redirect('/dashboard');
   }
 
-  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'Login.html'));
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'login.html'));
 });
 
 app.get('/register', (req, res) => {
@@ -148,7 +157,7 @@ app.get('/register', (req, res) => {
     return res.redirect('/dashboard');
   }
 
-  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'Register.html'));
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'register.html'));
 });
 
 app.get('/forgot-password', (req, res) => {
@@ -162,6 +171,18 @@ app.get('/forgot-password', (req, res) => {
     return res.redirect('/dashboard');
   }
 
+app.use("/api/candidates", require("./src/routes/candidateRoutes"));
+
+// Frontend routes
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'login.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html','register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'forget-password.html'));
 });
 
@@ -223,7 +244,4 @@ app.get('/{*path}', (req, res) => {
 });
 
 module.exports = app;
-
-
-
-
+});

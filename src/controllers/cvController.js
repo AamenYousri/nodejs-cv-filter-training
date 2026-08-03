@@ -88,7 +88,15 @@ const uploadCV = async (req, res) => {
         )
         RETURNING *
         `,
-        [cvData.name, cvData.email, uploaded_by, cvData.jobTitle ? cvData.jobTitle.raw : null, cvData.city, String(Math.floor(cvData.yearsOfExperience)), cvData.skills],
+        [
+          cvData.name,
+          cvData.email,
+          uploaded_by,
+          cvData.jobTitle ? cvData.jobTitle.raw : null,
+          cvData.city,
+          String(Math.floor(cvData.yearsOfExperience)),
+          cvData.skills,
+        ],
       );
 
       const candidate = candidateResult.rows[0];
@@ -158,10 +166,48 @@ const uploadCV = async (req, res) => {
   }
 };
 
-module.exports = {
-  uploadCV,
+const { getLibraryCVs } = require("../models/cvModel");
+
+// ======================================================
+// Get CV Library
+// ======================================================
+
+const getAllLibraryCVs = async (req, res) => {
+  try {
+    const { search, status, from_date, to_date } = req.query;
+
+    const cvs = await getLibraryCVs({
+      search,
+
+      status,
+
+      from_date,
+
+      to_date,
+    });
+
+    return res.status(200).json({
+      success: true,
+
+      count: cvs.length,
+
+      cvs,
+    });
+  } catch (error) {
+    console.error("Library Error:", error);
+
+    return res.status(500).json({
+      success: false,
+
+      message: "Failed to get CV library",
+
+      error: error.message,
+    });
+  }
 };
 
-
-
+module.exports = {
+  uploadCV,
+  getAllLibraryCVs,
+};
 
