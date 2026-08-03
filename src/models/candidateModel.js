@@ -183,6 +183,30 @@ const getCandidates = async ({
 };
 
 // ======================================================
+// Get CV File Path (needed before deleting, since the
+// physical file on disk must be removed too, and the
+// cv_files row disappears via CASCADE once we delete
+// the candidate).
+// ======================================================
+
+const getCvFilePathByCandidateId = async (candidateId) => {
+
+  const query = `
+    SELECT file_path
+    FROM cv_files
+    WHERE candidate_id = $1
+  `;
+
+  const result = await pool.query(query, [candidateId]);
+
+  return result.rows[0]
+    ? result.rows[0].file_path
+    : null;
+
+};
+
+
+// ======================================================
 // Delete Candidate
 // ======================================================
 
@@ -203,5 +227,6 @@ const deleteCandidateById = async (id) => {
 
 module.exports = {
   getCandidates,
+  getCvFilePathByCandidateId,
   deleteCandidateById 
 };

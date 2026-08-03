@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS users (
       job_title           VARCHAR(150),
       years_of_experience INTEGER,
       skills              TEXT[],
-      status              VARCHAR(50) DEFAULT 'Pending',
+      status              VARCHAR(50) DEFAULT 'Review',
       created_by          INTEGER NOT NULL REFERENCES users(id),
       created_at          TIMESTAMPTZ DEFAULT NOW()
     );

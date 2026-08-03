@@ -1,5 +1,8 @@
+const fs = require('fs');
+const path = require('path');
 const {
   getCandidates,
+  getCvFilePathByCandidateId,
   deleteCandidateById
 } = require('../models/candidateModel');
 
@@ -111,6 +114,14 @@ const deleteCandidate = async (req, res) => {
 
     const { id } = req.params;
 
+    // ==================================================
+    // Get the physical file path BEFORE deleting,
+    // since deleting the candidate cascades and removes
+    // the cv_files row (and its file_path) with it.
+    // ==================================================
+
+    const filePath = await getCvFilePathByCandidateId(id);
+
     const deleted = await deleteCandidateById(id);
 
     if (!deleted) {
@@ -120,6 +131,32 @@ const deleteCandidate = async (req, res) => {
         success: false,
 
         message: 'Candidate not found'
+
+      });
+
+    }
+
+    // ==================================================
+    // Remove the physical file from disk too, so we
+    // don't leave orphaned files behind. This must not
+    // fail the whole request if the file is already gone.
+    // ==================================================
+
+    if (filePath) {
+
+      const absolutePath = path.resolve(filePath);
+
+      fs.unlink(absolutePath, (err) => {
+
+        if (err) {
+
+          console.warn(
+            'Could not delete CV file from disk:',
+            absolutePath,
+            err.message
+          );
+
+        }
 
       });
 

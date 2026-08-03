@@ -1,3 +1,5 @@
+console.log("CV routes loaded")
+
 const express = require("express");
 const upload = require("../middleware/multerMiddleware");
 const protect = require("../middleware/authMiddleware");
@@ -20,7 +22,10 @@ router.post(
 // type, candidate name, status, date...). All the logic
 // lives in CvLibraryController -> Service -> Repository.
 // ======================================================
-router.get("/library", protect, cvLibraryController.getLibrary);
+router.get("/library", (req, res, next) => {
+  console.log("Library route hit!");
+  next();
+}, protect, cvLibraryController.getLibrary);
 
 router.post("/extract", protect, async (req, res) => {
   try {

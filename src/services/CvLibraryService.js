@@ -43,6 +43,7 @@ class CvLibraryService {
   _toLibraryItem(row) {
     return {
       id: row.id,
+      candidateId: row.candidate_id,
       fileName: row.file_name,
       documentType: this._resolveDocumentType(row.file_name),
       candidateName: row.candidate_name,
