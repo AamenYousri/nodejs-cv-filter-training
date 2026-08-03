@@ -21,7 +21,7 @@ body {
 ===================================== */
 
 .filter-section {
-  width: 570px;
+  width: fit-content;
 
   background-color: #ffffff;
 
@@ -121,9 +121,7 @@ body {
 
   grid-template-columns:
     1fr
-    1.25fr
-    1fr
-    1fr;
+    1.25fr;
 
   gap: 8px;
 
@@ -211,8 +209,7 @@ body {
 .multi-input {
   min-width: 35px;
 
-  width: 35px;
-
+  width: 100%;
   flex: 1;
 
   height: 24px;
