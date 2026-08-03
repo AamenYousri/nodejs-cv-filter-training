@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const { sendOTPEmail } = require('./emailController');
 
 function isCompanyEmail(email) {
-  const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN;
-  return email.toLowerCase().endsWith(`@${allowedDomain.toLowerCase()}`);
+  const allowedDomain = (process.env.ALLOWED_EMAIL_DOMAIN || 'allForOne.com').toLowerCase();
+  return email.toLowerCase().endsWith(`@${allowedDomain}`);
 }
 
 function generateAccessToken(user) {
@@ -66,8 +66,10 @@ async function register(req, res) {
     );
     const newUser = result.rows[0];
 
-    await sendOTPEmail(newUser);
-    
+    await sendOTPEmail({
+      ...newUser,
+      otp_code: otpCode,
+    });
 
     const token = generateAccessToken(newUser);
 
@@ -83,6 +85,13 @@ async function register(req, res) {
       message:
         "Registered successfully. Please verify your email using the OTP sent.",
       token,
+      data: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        created_at: newUser.created_at,
+        is_verified: newUser.is_verified,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -189,7 +198,7 @@ async function verifyOTP(req, res) {
 const resendOTP = async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
     }
@@ -201,10 +210,20 @@ const resendOTP = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    regenerateOTP(user);
-    
+    if (user.is_verified) {
+      return res.status(400).json({
+        success: false,
+        error: 'User is already verified',
+      });
+    }
 
-     // await sendOTPEmail({ ...user, otp_code: otpCode, otp_expiry: otpExpiresAt });
+    const otpResult = await regenerateOTP(user);
+    const updatedUser = otpResult.rows[0];
+
+    await sendOTPEmail({
+      ...updatedUser,
+      otp_code: updatedUser.otp_code,
+    });
 
     return res.status(200).json({
       success: true,
@@ -386,6 +405,20 @@ const login = async (req, res) => {
 
   res.json({ message: "Login successful", accessToken: token });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = {
   register,

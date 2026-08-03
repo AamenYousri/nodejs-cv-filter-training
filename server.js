@@ -218,5 +218,6 @@ app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
+
 module.exports = app;
 
