@@ -20,7 +20,13 @@ body {
   font-family: "Inter", sans-serif;
   gap: 30px;
 }
-
+#desktop-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  width: 1px;
+}
 .sidebar-logo {
   display: flex;
   flex-direction: column;
@@ -61,6 +67,14 @@ body {
   text-decoration: none;
   font-size: 14px;
   transition: background 0.2s;
+  
+}
+.menu-item span {
+  color: #ffffff;
+}
+
+.menu-item i {
+  color: #ffffff;
 }
 
 .menu-item:hover {
@@ -70,8 +84,12 @@ body {
 
 .menu-item.active {
   background: var(--sidebar-accent-light);
-  stroke: #9da69b;
   font-weight: 600;
+  color: var(--sidebar-accent);
+}
+
+.menu-item.active i,
+.menu-item.active span {
   color: var(--sidebar-accent);
 }
 
@@ -117,6 +135,12 @@ body {
   color: #121c2d !important;
 }
 
+.main-content-container {
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
 @media (max-width: 991px) {
   .sidebar-toggle {
     display: block;
@@ -145,7 +169,22 @@ body {
   transition: 0.3s ease;
 }
 
+.logout-btn i,
+.logout-btn span {
+  color: #ff6b6b;
+}
+
+.logout-btn.active {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff6b6b;
+}
+
 .logout-btn:hover {
   color: #ff8787;
   background: rgba(255, 107, 107, 0.12);
+}
+
+.logout-btn:hover i,
+.logout-btn:hover span {
+  color: #ff8787;
 }

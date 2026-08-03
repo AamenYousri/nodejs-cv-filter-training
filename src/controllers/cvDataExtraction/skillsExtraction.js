@@ -30,7 +30,7 @@ const fuse = new Fuse(
     {
         keys: ["normalized"],
         includeScore: true,
-        threshold: 0.15,
+        threshold: 0.1,
         ignoreLocation: true,
         minMatchCharLength: 3
     }

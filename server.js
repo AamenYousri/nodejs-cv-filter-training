@@ -2,15 +2,30 @@
 const express = require("express");
 require("dotenv").config();
 const path = require("path");
+const jwt = require("jsonwebtoken");
 const pool = require("./src/db/index");
-<<<<<<< HEAD
 
-=======
->>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
 const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 app.use(express.json());
 const cors = require("cors");
+
+app.use((req, res, next) => {
+  req.cookies = {};
+  const rawCookies = req.headers.cookie;
+
+  if (!rawCookies) {
+    return next();
+  }
+
+  rawCookies.split(';').forEach((cookie) => {
+    const [key, ...rest] = cookie.trim().split('=');
+    if (!key) return;
+    req.cookies[key] = decodeURIComponent(rest.join('='));
+  });
+
+  next();
+});
 
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
@@ -75,45 +90,122 @@ initDB()
     process.exit(1);
   });
 
+function getAccessToken(req) {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+
+  if (authHeader && /^Bearer\s+/i.test(authHeader)) {
+    return authHeader.replace(/^Bearer\s+/i, '').trim();
+  }
+
+  return req.cookies?.accessToken || null;
+}
+
+function getTokenPayload(req) {
+  const token = getAccessToken(req);
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return null;
+  }
+}
+
 app.use(express.urlencoded({ extended: true }));
-<<<<<<< HEAD
-app.use(express.static(path.join(__dirname, "src", "public" )));
-=======
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 app.use(cors());
->>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
 
 // API routes
 app.use("/api/cvs", require("./src/routes/cvRoutes"));
 app.use("/api/auth", require("./src/routes/authRoutes"));
-<<<<<<< HEAD
-
-// Serve the UI for any other route
-app.get("/{*path}", (req, res) => {
-  res.sendFile(path.join(__dirname, "src", "public", "html", "sidebar-test.html"));
-=======
 
 // Frontend routes
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'Login.html'));
+  const tokenPayload = getTokenPayload(req);
+
+  if (tokenPayload) {
+    if (tokenPayload.is_verified === false) {
+      return res.redirect('/otp-verification');
+    }
+
+    return res.redirect('/dashboard');
+  }
+
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'Login.html'));
 });
 
 app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'Register.html'));
+  const tokenPayload = getTokenPayload(req);
+
+  if (tokenPayload) {
+    if (tokenPayload.is_verified === false) {
+      return res.redirect('/otp-verification');
+    }
+
+    return res.redirect('/dashboard');
+  }
+
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'Register.html'));
 });
 
 app.get('/forgot-password', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'forget-password.html'));
+  const tokenPayload = getTokenPayload(req);
+
+  if (tokenPayload) {
+    if (tokenPayload.is_verified === false) {
+      return res.redirect('/otp-verification');
+    }
+
+    return res.redirect('/dashboard');
+  }
+
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'forget-password.html'));
 });
 
 app.get('/otp-verification', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'Otp.html'));
+  const tokenPayload = getTokenPayload(req);
+
+  if (!tokenPayload) {
+    return res.redirect('/login');
+  }
+
+  if (tokenPayload.is_verified === true) {
+    return res.redirect('/dashboard');
+  }
+
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'otp.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  const tokenPayload = getTokenPayload(req);
+
+  if (!tokenPayload) {
+    return res.redirect('/login');
+  }
+
+  if (tokenPayload.is_verified === false) {
+    return res.redirect('/otp-verification');
+  }
+
+  res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
->>>>>>> b388b6836a13451ddebf9f5d34ac7f0602f50d25
+  const tokenPayload = getTokenPayload(req);
+
+  if (!tokenPayload) {
+    return res.redirect('/login');
+  }
+
+  if (tokenPayload.is_verified === false) {
+    return res.redirect('/otp-verification');
+  }
+
+  res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
 app.use("/api/uploads", express.static("uploads"));

@@ -10,9 +10,11 @@ function isCompanyEmail(email) {
 }
 
 function generateAccessToken(user) {
-  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: '10d',
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, name: user.name, is_verified: Boolean(user.is_verified) },
+    process.env.JWT_SECRET,
+    { expiresIn: '10d' }
+  );
 }
 
 function generateOTP() {
@@ -67,11 +69,20 @@ async function register(req, res) {
     await sendOTPEmail(newUser);
     
 
+    const token = generateAccessToken(newUser);
+
+    res.cookie('accessToken', token, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(201).json({
       success: true,
       message:
         "Registered successfully. Please verify your email using the OTP sent.",
-        token: generateAccessToken(newUser),
+      token,
     });
   } catch (err) {
     console.error(err);
@@ -103,7 +114,7 @@ async function verifyOTP(req, res) {
     }
 
     const userResult = await pool.query(
-      "SELECT id, otp_code, otp_expiry, is_verified FROM users WHERE email = $1",
+      "SELECT id, name, email, otp_code, otp_expiry, is_verified FROM users WHERE email = $1",
       [email],
     );
 
@@ -144,9 +155,26 @@ async function verifyOTP(req, res) {
       [user.id],
     );
 
+    const verifiedUser = {
+      ...user,
+      is_verified: true,
+      name: user.name,
+      email: user.email,
+      id: user.id,
+    };
+    const newToken = generateAccessToken(verifiedUser);
+
+    res.cookie('accessToken', newToken, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Email verified successfully",
+      token: newToken,
     });
   } catch (err) {
     console.error(err);
@@ -159,22 +187,38 @@ async function verifyOTP(req, res) {
 
 
 const resendOTP = async (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    regenerateOTP(user);
+    
+
+     // await sendOTPEmail({ ...user, otp_code: otpCode, otp_expiry: otpExpiresAt });
+
+    return res.status(200).json({
+      success: true,
+      message: 'OTP resent successfully',
+    });
+  } catch (error) {
+    console.error('Resend OTP error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Something went wrong while resending OTP',
+      err: error.message
+    });
   }
-  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-  const user = result.rows[0];
-
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-
-  const updatedUser = regenerateOTP(user);
-  return res.status(200).json({ message: 'OTP resent successfully'});
-
-}
+};
 
 async function forgotPassword(req, res) {
   try {
@@ -298,9 +342,11 @@ async function resetPassword(req, res) {
 }
 
 const createAccessToken = (user) => {
-  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: "10d",
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, name: user.name, is_verified: Boolean(user.is_verified) },
+    process.env.JWT_SECRET,
+    { expiresIn: "10d" }
+  );
 };
 
 
@@ -330,6 +376,14 @@ const login = async (req, res) => {
   }
 
   const token = createAccessToken(user);
+
+  res.cookie('accessToken', token, {
+    httpOnly: false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 10 * 24 * 60 * 60 * 1000,
+  });
+
   res.json({ message: "Login successful", accessToken: token });
 };
 
