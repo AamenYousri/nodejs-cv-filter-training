@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library List</title>
+    <link rel="stylesheet" href="../css/cv-library.css" />
+
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="table-container">
+      <h2>Library List</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name <i class="fa-solid fa-chevron-down"></i></th>
+            <th>File Name <i class="fa-solid fa-chevron-down"></i></th>
+            <th>Document Type <i class="fa-solid fa-chevron-down"></i></th>
+            <th>Status <i class="fa-solid fa-chevron-down"></i></th>
+            <th>Date <i class="fa-solid fa-chevron-down"></i></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="library-tbody">
+          <!-- Rows will be rendered dynamically by cv-library.js -->
+        </tbody>
+      </table>
+    </div>
+
+    <script src="../cv-library.js"></script>
+  </body>
+</html>
