@@ -6,6 +6,7 @@ const pool = require('../db/index');
 // ======================================================
 
 const getCandidates = async ({
+  created_by,
   search,
   skills,
   city,
@@ -39,11 +40,20 @@ const getCandidates = async ({
     WHERE 1 = 1
   `;
 
+ 
 
   const values = [];
 
   let parameterIndex = 1;
 
+
+   query += `
+  AND c.created_by = $${parameterIndex}
+`;
+
+  values.push(created_by);
+
+  parameterIndex++;
 
   // ======================================================
   // Search
@@ -182,7 +192,51 @@ const getCandidates = async ({
 
 };
 
+// ======================================================
+// Get CV File Path (needed before deleting, since the
+// physical file on disk must be removed too, and the
+// cv_files row disappears via CASCADE once we delete
+// the candidate).
+// ======================================================
+
+const getCvFilePathByCandidateId = async (candidateId) => {
+
+  const query = `
+    SELECT file_path
+    FROM cv_files
+    WHERE candidate_id = $1
+  `;
+
+  const result = await pool.query(query, [candidateId]);
+
+  return result.rows[0]
+    ? result.rows[0].file_path
+    : null;
+
+};
+
+
+// ======================================================
+// Delete Candidate
+// ======================================================
+
+const deleteCandidateById = async (id) => {
+
+  const query = `
+    DELETE FROM candidates
+    WHERE id = $1
+    RETURNING id
+  `;
+
+  const result = await pool.query(query, [id]);
+
+  return result.rows[0];
+
+};
+
 
 module.exports = {
-  getCandidates
+  getCandidates,
+  getCvFilePathByCandidateId,
+  deleteCandidateById 
 };

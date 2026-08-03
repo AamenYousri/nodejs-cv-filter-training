@@ -1,0 +1,66 @@
+.main-content-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px;
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+}
+
+
+.dashboard-filteration {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+body {
+    background: #f8fafc;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header button {
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#selectedFiles {
+    margin: 15px 0;
+}
+
+.file-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}

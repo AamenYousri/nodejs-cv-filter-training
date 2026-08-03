@@ -125,6 +125,7 @@ class Sidebar {
 
       this.#highlightActivePage();
       this.#bindMenuClicks();
+      this.#bindUploadButton();
       this.#bindLogout();
       await this.#loadUserInfo();
     } catch (error) {
@@ -133,15 +134,33 @@ class Sidebar {
   }
 
   #bindMenuClicks() {
-    const menuItems = this.container.querySelectorAll('.menu-item[data-page]');
-    menuItems.forEach((item) => {
-      item.addEventListener('click', (event) => {
-        event.preventDefault();
-        const page = item.dataset.page;
-        Sidebar.#instances.forEach((instance) => instance.#applyActivePage(page));
-      });
+  const menuItems = this.container.querySelectorAll(".menu-item[data-page]");
+
+  menuItems.forEach((item) => {
+    item.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      const page = item.dataset.page;
+
+      switch (page) {
+        case "dashboard":
+          window.location.href = "/dashboard";
+          break;
+
+        case "library":
+          window.location.href = "/library";
+          break;
+
+        case "upload":
+          document.dispatchEvent(new CustomEvent("open-upload-modal"));
+          break;
+
+        default:
+          console.warn(`No route configured for "${page}"`);
+      }
     });
-  }
+  });
+}
 
   #bindLogout() {
     const logoutBtn = this.container.querySelector('#logoutBtn');
@@ -161,6 +180,18 @@ class Sidebar {
     });
   }
 
+  #bindUploadButton() {
+    const uploadBtn = this.container.querySelector("#uploadCvBtn");
+
+    if (!uploadBtn) return;
+
+    uploadBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        document.dispatchEvent(new CustomEvent("open-upload-modal"));
+    });
+}
+
   #highlightActivePage() {
     const currentPage = this.container.dataset.activePage;
     this.#applyActivePage(currentPage);
@@ -175,6 +206,8 @@ class Sidebar {
     }
   }
 }
+
+
 
 window.TokenStorage = TokenStorage;
 window.UserService = UserService;

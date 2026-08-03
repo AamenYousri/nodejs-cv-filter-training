@@ -4,7 +4,6 @@ require("dotenv").config();
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const pool = require("./src/db/index");
-
 const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 app.use(express.json());
@@ -60,7 +59,7 @@ CREATE TABLE IF NOT EXISTS users (
       job_title           VARCHAR(150),
       years_of_experience INTEGER,
       skills              TEXT[],
-      status              VARCHAR(50) DEFAULT 'Pending',
+      status              VARCHAR(50) DEFAULT 'Review',
       created_by          INTEGER NOT NULL REFERENCES users(id),
       created_at          TIMESTAMPTZ DEFAULT NOW()
     );
@@ -172,6 +171,18 @@ app.get('/forgot-password', (req, res) => {
     return res.redirect('/dashboard');
   }
 
+app.use("/api/candidates", require("./src/routes/candidateRoutes"));
+
+// Frontend routes
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'login.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html','register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'forget-password.html'));
 });
 
@@ -203,6 +214,20 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
 });
 
+
+
+app.use("/api/uploads", express.static("uploads"));
+
+const cvRoutes = require("./src/routes/cvRoutes");
+
+// ==========================================
+// CV Routes
+// ==========================================
+
+app.use("/api/cv", cvRoutes);
+
+app.use("/api/candidates", require("./src/routes/candidateRoutes"))
+
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
   const tokenPayload = getTokenPayload(req);
@@ -220,4 +245,4 @@ app.get('/{*path}', (req, res) => {
 
 
 module.exports = app;
-
+});
