@@ -10,16 +10,20 @@
     { id: 3, name: 'Aly Mohamed', title: 'Software Engineer', experience: '4 Years', city: 'Cairo, Egypt', match: 50, status: 'Accepted', cvLink: '#', email: 'aly@example.com' },
   ];
 
+  let displayedCandidates = [...candidates];
+
   function matchClass(score) {
     if (score >= 90) return 'excellent';
     return 'average';
   }
 
-  function render() {
+  function render(data = displayedCandidates) {
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    candidates.forEach((c) => {
+    displayedCandidates = [...data]
+
+    displayedCandidates.forEach((c) => {
       const tr = document.createElement('tr');
 
       tr.innerHTML = `
@@ -58,6 +62,12 @@
 
       tbody.appendChild(tr);
     });
+
+    // Rebuild filter dropdowns after rendering the table
+  if (window.renderFilterOptionsFromRows) {
+    window.renderFilterOptionsFromRows();
+  }
+
   }
 
   function createBtn(cls, icon, text, onClick) {
@@ -143,7 +153,7 @@
       sortState.direction = 'asc';
     }
 
-    candidates.sort((a, b) => {
+    displayedCandidates.sort((a, b) => {
       const res = compareByIndex(a, b, index);
       return sortState.direction === 'asc' ? res : -res;
     });
@@ -165,10 +175,128 @@
     });
   }
 
+  async function loadCandidates() {
+    try {
+        const response = await fetch("/api/candidates");
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch candidates");
+        }
+
+        candidates = await response.json();
+        candidates = candidates.candidates.map(candidate => ({
+    ...candidate,
+
+    name: candidate.name ?? "N/A",
+    email: candidate.email ?? "N/A",
+    city: candidate.city ?? "N/A",
+    title: candidate.job_title ?? "N/A",
+    status: candidate.status ?? "",
+    file_name: candidate.file_name ?? "",
+    file_path: candidate.file_path ?? "",
+    experience:
+        candidate.years_of_experience == null
+            ? ""
+            : `${candidate.years_of_experience} Years`,
+    cvLink:"/api/" + candidate.file_path
+}));
+        
+
+        
+
+        displayedCandidates = [...candidates];
+
+        console.log(candidates)
+
+        render(displayedCandidates);
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
   // Initial render and attach sort handlers
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     attachSortHandlers();
-    render();
-  });
+    await loadCandidates();
+});
+
+  function filterCandidates(filters) {
+    return candidates.filter(candidate => {
+
+        // Search
+        if (filters.search) {
+
+    const search = filters.search.toLowerCase();
+
+    const matches =
+        candidate.name.toLowerCase().includes(search) ||
+        candidate.title.toLowerCase().includes(search) ||
+        candidate.city.toLowerCase().includes(search);
+
+    if (!matches) {
+        return false;
+    }
+}
+
+        // City
+        if (
+            filters.city.length &&
+            !filters.city.includes(candidate.city)
+        ) {
+            return false;
+        }
+
+        // Job Title
+        if (
+            filters.jobTitle.length &&
+            !filters.jobTitle.includes(candidate.title)
+        ) {
+            return false;
+        }
+
+        // Experience
+        if (
+            filters.experience.length &&
+            !filters.experience.includes(candidate.experience)
+        ) {
+            return false;
+        }
+
+        // Skills
+        if (filters.skills.length) {
+            const candidateSkills = candidate.skills || [];
+
+            const hasAllSkills = filters.skills.every(skill =>
+                candidateSkills.some(s =>
+                    s.toLowerCase() === skill.toLowerCase()
+                )
+            );
+
+            if (!hasAllSkills) return false;
+        }
+
+        return true;
+    });
+}
+
+window.filterCandidates = filterCandidates;
+window.renderCandidates = render;
+window.loadCandidates = loadCandidates;
+
+function resetCandidates() {
+    displayedCandidates = [...candidates];
+
+    sortState.index = null;
+    sortState.direction = "asc";
+
+    updateSortIcons(-1, "asc");
+
+    render(displayedCandidates);
+}
+
+window.resetCandidates = resetCandidates;
 
 })();
+
+
