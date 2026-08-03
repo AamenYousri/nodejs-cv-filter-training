@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 const candidateController = require("../controllers/candidateController");
-const protect = require("../middleware/authMiddleware");
+
 const candidateStatusController = require("../controllers/candidateStatusController");
 
 const getCandidatesHandler =
