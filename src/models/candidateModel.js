@@ -269,6 +269,7 @@ const findCandidateByEmail = async (email) => {
 
 module.exports = {
   getCandidates,
+  getCvFilePathByCandidateId,
   deleteCandidateById,
   findCandidateByEmail
 };

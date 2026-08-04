@@ -56,7 +56,7 @@ async function register(req, res) {
 
     const otpCode = generateOTP();
     const otpCodeHash = await bcrypt.hash(otpCode, 10);
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     const result = await pool.query(
       `INSERT INTO users (name, email, password_hash, OTP_CODE, OTP_EXPIRY)
