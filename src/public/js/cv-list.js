@@ -1,15 +1,18 @@
-// candidates-list.js
-// Dynamic candidates list with a modifiable array and simple API.
+// cv-list.js
+// Dynamic CV list with a modifiable array and simple API.
+
+
 
 (function () {
   const tbody = document.getElementById('candidates-tbody');
 
   
+  
 
-  async function updateCandidateStatus(candidateId, accessToken, status) {
+  async function deleteCand(candidateId, accessToken, status) {
   try {
-    const response = await fetch(`/api/candidates/${candidateId}/status`, {
-      method: "PATCH", // Change to PUT if your route uses PUT
+    const response = await fetch(`/api/candidates/${candidateId}/`, {
+      method: "DELETE", // Change to PUT if your route uses PUT
       headers: {
         "Content-Type": "application/json",
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -20,12 +23,12 @@
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Failed to update candidate status");
+      throw new Error(data.message || "Failed to delete candidate");
     }
-    
+
     return data;
   } catch (error) {
-    console.error("Error updating candidate status:", error);
+    console.error("Error deleting candidate:", error);
     throw error;
   }
 
@@ -41,9 +44,10 @@
 
   let displayedCandidates = [...candidates];
 
-  async function handleCandidateStatusUpdate(candidateId, status) {
+  
+  async function deleteCandidate(candidateId, status) {
     try {
-      await updateCandidateStatus(candidateId, window.TokenStorage?.get(), status);
+      await deleteCand(candidateId, window.TokenStorage?.get(), status);
 
       candidates = candidates.map((candidate) =>
         candidate.id === candidateId ? { ...candidate, status } : candidate,
@@ -59,6 +63,7 @@
     }
   }
 
+
   function matchClass(score) {
     if (score >= 90) return 'excellent';
     return 'average';
@@ -73,12 +78,13 @@
     displayedCandidates.forEach((c) => {
       const tr = document.createElement('tr');
 
+      const doctype = c.file_name.slice(c.file_name.lastIndexOf("."));
+      console.log(doctype)
       tr.innerHTML = `
         <td>${escapeHtml(c.name)}</td>
-        <td>${escapeHtml(c.title)}</td>
-        <td>${escapeHtml(c.experience)}</td>
-        <td>${escapeHtml(c.city)}</td>
-        <td><span class="badge match ${matchClass(c.match)}">${c.match ? c.match + "% Match" : "N/A"}</span></td>
+        <td>${escapeHtml(c.file_name)}</td>
+        <td>${escapeHtml(doctype)}</td>
+        <td>${escapeHtml((c.uploaded_at || "").slice(0, 10))}</td>
         <td><span class="badge ${statusClass(c.status)}">${escapeHtml(c.status)}</span></td>
         <td class="actions"></td>
       `;
@@ -91,15 +97,9 @@
       });
       actionsTd.appendChild(cvBtn);
 
-      // Accept/Reject buttons for review status
-      if (c.status === 'Review') {
-
-        const acceptBtn = createBtn('accept', 'fa-check', 'Accept', () => handleCandidateStatusUpdate(c.id, 'Accepted'));
-        const rejectBtn = createBtn('reject', 'fa-xmark', 'Reject', () => handleCandidateStatusUpdate(c.id, 'Rejected'));
-        actionsTd.appendChild(acceptBtn);
-        actionsTd.appendChild(rejectBtn);
-      }
-
+      
+      
+      
       // Email button
       if (c.status !== 'Review' && c.status !== 'Done') {
         const emailBtn = createBtn('email', 'fa-envelope', 'Send Email', () => {
@@ -107,6 +107,9 @@
         });
         actionsTd.appendChild(emailBtn);
       }
+
+      const rejectBtn = createBtn('reject', 'fa-xmark', 'Delete', () => deleteCandidate(c.id));
+        actionsTd.appendChild(rejectBtn);
 
       tbody.appendChild(tr);
     });
@@ -149,6 +152,8 @@
     });
   }
 
+
+
   // Sorting state and helpers
   const sortState = { index: null, direction: 'asc' }; // direction: 'asc' or 'desc'
 
@@ -160,22 +165,29 @@
 
   function compareByIndex(a, b, index) {
     switch (index) {
-      case 0: // name
-        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
-      case 1: // title
-        return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
-      case 2: // experience (numeric years)
-        return parseExperience(a.experience) - parseExperience(b.experience);
-      case 3: // city
-        return a.city.localeCompare(b.city, undefined, { sensitivity: 'base' });
-      case 4: // match (numeric)
-        return (a.match || 0) - (b.match || 0);
-      case 5: // status
-        return a.status.localeCompare(b.status, undefined, { sensitivity: 'base' });
-      default:
-        return 0;
+        case 0: // Name
+            return a.name.localeCompare(b.name);
+
+        case 1: // Filename
+            return a.file_name.localeCompare(b.file_name);
+
+        case 2: // File type
+            return a.file_name
+                .slice(a.file_name.lastIndexOf("."))
+                .localeCompare(
+                    b.file_name.slice(b.file_name.lastIndexOf("."))
+                );
+
+        case 3: // Upload date
+            return new Date(a.uploaded_at) - new Date(b.uploaded_at);
+
+        case 4: // Status
+            return a.status.localeCompare(b.status);
+
+        default:
+            return 0;
     }
-  }
+}
 
   function updateSortIcons(selectedIndex, direction) {
     const ths = document.querySelectorAll('table thead th');
@@ -237,16 +249,11 @@
 
     name: candidate.name ?? "N/A",
     email: candidate.email ?? "N/A",
-    city: candidate.city ?? "N/A",
-    title: candidate.job_title ?? "N/A",
     status: candidate.status ?? "",
     file_name: candidate.file_name ?? "",
     file_path: candidate.file_path ?? "",
-    experience:
-        candidate.years_of_experience == null
-            ? ""
-            : `${candidate.years_of_experience} Years`,
-    cvLink:"/api/" + candidate.file_path
+    uploaded_at: candidate.uploaded_at ?? "",
+    cvLink: "/api/" + candidate.file_path
 }));
         
 
@@ -272,56 +279,28 @@
   function filterCandidates(filters) {
     return candidates.filter(candidate => {
 
-        // Search
         if (filters.search) {
+            const search = filters.search.toLowerCase();
 
-    const search = filters.search.toLowerCase();
+            const matches =
+                candidate.name.toLowerCase().includes(search) ||
+                candidate.file_name.toLowerCase().includes(search);
 
-    const matches =
-        candidate.name.toLowerCase().includes(search) ||
-        candidate.title.toLowerCase().includes(search) ||
-        candidate.city.toLowerCase().includes(search);
+            if (!matches) return false;
+        }
 
-    if (!matches) {
-        return false;
-    }
-}
-
-        // City
         if (
-            filters.city.length &&
-            !filters.city.includes(candidate.city)
+            filters.date.length &&
+            !filters.date.includes((candidate.uploaded_at || "").slice(0, 10))
         ) {
             return false;
         }
 
-        // Job Title
         if (
-            filters.jobTitle.length &&
-            !filters.jobTitle.includes(candidate.title)
+            filters.status.length &&
+            !filters.status.includes(candidate.status)
         ) {
             return false;
-        }
-
-        // Experience
-        if (
-            filters.experience.length &&
-            !filters.experience.includes(candidate.experience)
-        ) {
-            return false;
-        }
-
-        // Skills
-        if (filters.skills.length) {
-            const candidateSkills = candidate.skills || [];
-
-            const hasAllSkills = filters.skills.every(skill =>
-                candidateSkills.some(s =>
-                    s.toLowerCase() === skill.toLowerCase()
-                )
-            );
-
-            if (!hasAllSkills) return false;
         }
 
         return true;

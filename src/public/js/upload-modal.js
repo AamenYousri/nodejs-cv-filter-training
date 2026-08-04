@@ -1,82 +1,97 @@
 const uploadModal = document.getElementById("uploadModal");
-
-document.addEventListener("open-upload-modal", () => {
-    uploadModal.classList.add("show");
-});
-
-document
-    .getElementById("closeUploadModal")
-    .addEventListener("click", () => {
-        uploadModal.classList.remove("show");
-    });
-
-uploadModal.addEventListener("click", (e) => {
-    if (e.target === uploadModal) {
-        uploadModal.classList.remove("show");
-    }
-});
-
-
 const fileInput = document.getElementById("cvFiles");
 const selectedFiles = document.getElementById("selectedFiles");
+const uploadButton = document.getElementById("uploadCvBtn");
+const closeButton = document.getElementById("closeUploadModal");
+const cancelButton = document.getElementById("cancelUploadBtn");
+const statusMessage = document.getElementById("uploadStatus");
 
-fileInput.addEventListener("change", () => {
+let isUploading = false;
 
-    selectedFiles.innerHTML = "";
+function setStatus(message = "", isError = false) {
+  statusMessage.textContent = message;
+  statusMessage.classList.toggle("error", isError);
+}
 
-    [...fileInput.files].forEach(file => {
+function setUploading(uploading) {
+  isUploading = uploading;
+  uploadButton.disabled = uploading;
+  closeButton.disabled = uploading;
+  cancelButton.disabled = uploading;
+  uploadButton.classList.toggle("is-loading", uploading);
+  uploadButton.querySelector(".button-label").textContent = uploading ? "Uploading..." : "Upload CVs";
+}
 
-        const div = document.createElement("div");
+function closeModal() {
+  if (!isUploading) uploadModal.classList.remove("show");
+}
 
-        div.className = "file-item";
-        div.textContent = file.name;
+function resetFiles() {
+  fileInput.value = "";
+  selectedFiles.innerHTML = "";
+  setStatus();
+}
 
-        selectedFiles.appendChild(div);
-
-    });
-
+document.addEventListener("open-upload-modal", () => {
+  resetFiles();
+  uploadModal.classList.add("show");
+  fileInput.focus();
 });
 
+closeButton.addEventListener("click", closeModal);
+cancelButton.addEventListener("click", closeModal);
 
-document
-    .getElementById("uploadCvBtn")
-    .addEventListener("click", async () => {
+uploadModal.addEventListener("click", (event) => {
+  if (event.target === uploadModal) closeModal();
+});
 
-        const files = fileInput.files;
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && uploadModal.classList.contains("show")) closeModal();
+});
 
-        if (!files.length) {
-            alert("Select at least one CV.");
-            return;
-        }
+fileInput.addEventListener("change", () => {
+  selectedFiles.innerHTML = "";
+  setStatus();
 
-        const formData = new FormData();
+  [...fileInput.files].forEach((file) => {
+    const item = document.createElement("div");
+    item.className = "file-item";
+    item.textContent = file.name;
+    selectedFiles.appendChild(item);
+  });
+});
 
-        [...files].forEach(file => {
-            formData.append("cv", file);
-        });
+uploadButton.addEventListener("click", async () => {
+  const files = fileInput.files;
+  if (!files.length) {
+    setStatus("Choose at least one CV before uploading.", true);
+    fileInput.focus();
+    return;
+  }
 
-        const token = window.TokenStorage.get();
+  const formData = new FormData();
+  [...files].forEach((file) => formData.append("cv", file));
 
-        const response = await fetch("/api/cv/upload", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            body: formData,
-            
-        });
+  try {
+    setUploading(true);
+    setStatus(`Uploading ${files.length} ${files.length === 1 ? "file" : "files"}. This may take a moment.`);
 
-        const result = await response.json();
-
-        console.log(result);
-
-        uploadModal.classList.remove("show");
-
-        fileInput.value = "";
-        selectedFiles.innerHTML = "";
-        
-        if (window.loadCandidates) {
-            window.loadCandidates();
-        }
-
+    const token = window.TokenStorage?.get();
+    const response = await fetch("/api/cv/upload", {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
     });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || result.message || "Upload failed. Please try again.");
+
+    uploadModal.classList.remove("show");
+    resetFiles();
+    if (window.loadCandidates) await window.loadCandidates();
+  } catch (error) {
+    setStatus(error.message || "Upload failed. Please try again.", true);
+  } finally {
+    setUploading(false);
+  }
+});
