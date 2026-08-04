@@ -252,7 +252,7 @@ async function forgotPassword(req, res) {
     }
 
     const userResult = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
+      "SELECT id, name, email FROM users WHERE email = $1",
       [email],
     );
 
@@ -267,7 +267,7 @@ async function forgotPassword(req, res) {
 
     const resetCode = generateOTP();
     const resetCodeHash = await bcrypt.hash(resetCode, 10);
-    const resetExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const resetExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     await pool.query(
       `UPDATE users
@@ -276,6 +276,13 @@ async function forgotPassword(req, res) {
       [resetCodeHash, resetExpiresAt, user.id],
     );
 
+    await sendOTPEmail({
+      ...user,
+      otp_code: resetCode,
+    });
+
+    // Retain this local-development fallback so a reset can be completed when
+    // EmailJS credentials are not configured.
     console.log(`Password reset code for ${email}: ${resetCode}`);
 
     return res.status(200).json({
@@ -299,6 +306,13 @@ async function resetPassword(req, res) {
       return res.status(400).json({
         success: false,
         error: "email, resetCode, and newPassword are required",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "Password must be at least 6 characters long",
       });
     }
 
