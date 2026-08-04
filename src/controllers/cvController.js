@@ -1,5 +1,6 @@
 const pool = require("../db/index");
 const extractCvData = require("./cvDataExtraction/cvData");
+const { findCandidateByEmail } = require("../models/candidateModel");
 
 const uploadCV = async (req, res) => {
   // Start database transaction
@@ -49,6 +50,41 @@ const uploadCV = async (req, res) => {
     }
 
     // =====================================
+    // Check for duplicates BEFORE starting transaction
+    // =====================================
+
+    const confirmReplace =
+      req.body.confirmReplace === "true" || req.body.confirmReplace === true;
+    const duplicates = []; 
+      const extractedDataList = [];
+
+    for (const file of files) {
+      const cvData = await extractCvData(file.path);
+      extractedDataList.push({ file, cvData });
+
+      if (cvData.email) {
+        const existing = await findCandidateByEmail(cvData.email);
+
+        if (existing && !confirmReplace) {
+          duplicates.push({
+            fileName: file.originalname,
+            existingCandidateId: existing.id,
+            existingCandidateName: existing.name,
+            existingFileName: existing.file_name,
+          });
+        }
+      }
+    }
+
+    if (duplicates.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "One or more candidates already exist",
+        duplicates,
+      });
+    }
+
+    // =====================================
     // 4. Start transaction
     // =====================================
 
@@ -56,14 +92,23 @@ const uploadCV = async (req, res) => {
 
     const createdCandidates = [];
     const createdCVs = [];
+    let replacedCount = 0;
 
-    for (const file of files) {
-      // =====================================
-      // 4. Create candidate automatically
-      // =====================================
+for (const { file, cvData } of extractedDataList) {
+  // =====================================
+  // 4. Create candidate automatically
+  // (البيانات already مستخرجة من فوق، مش محتاجين نستخرجها تاني)
+  // =====================================
 
-      const cvData = await extractCvData(file.path);
-
+  if (cvData.email && confirmReplace) {
+        const existing = await findCandidateByEmail(cvData.email);
+        if (existing) {
+          await client.query("DELETE FROM candidates WHERE id = $1", [
+            existing.id,
+          ]);
+          replacedCount++;
+        }
+      }
       const candidateResult = await client.query(
         `
         INSERT INTO candidates
@@ -139,10 +184,20 @@ const uploadCV = async (req, res) => {
     // =====================================
     // 7. Return success
     // =====================================
+    const newCount = files.length - replacedCount;
+    let message = "";
+
+    if (replacedCount > 0 && newCount > 0) {
+      message = `${newCount} new CV${newCount === 1 ? "" : "s"} uploaded, ${replacedCount} existing CV${replacedCount === 1 ? "" : "s"} replaced`;
+    } else if (replacedCount > 0) {
+      message = `${replacedCount} CV${replacedCount === 1 ? "" : "s"} replaced successfully`;
+    } else {
+      message = `${files.length} CV${files.length === 1 ? "" : "s"} uploaded and candidate${files.length === 1 ? "" : "s"} created successfully`;
+    }
 
     return res.status(201).json({
       success: true,
-      message: `${files.length} CV${files.length === 1 ? "" : "s"} uploaded and candidate${files.length === 1 ? "" : "s"} created successfully`,
+      message,
       candidates: createdCandidates,
       cvs: createdCVs,
     });
@@ -210,4 +265,3 @@ module.exports = {
   uploadCV,
   getAllLibraryCVs,
 };
-

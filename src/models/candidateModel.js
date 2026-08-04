@@ -235,8 +235,40 @@ const deleteCandidateById = async (id) => {
 };
 
 
+// ======================================================
+// Check if candidate with this email exists
+// ======================================================
+
+const findCandidateByEmail = async (email) => {
+
+  const query = `
+    SELECT
+      c.id,
+      c.name,
+      c.email,
+      cv.file_name
+
+    FROM candidates c
+
+    LEFT JOIN cv_files cv
+      ON c.id = cv.candidate_id
+
+    WHERE c.email = $1
+
+    ORDER BY c.created_at DESC
+
+    LIMIT 1
+  `;
+
+  const result = await pool.query(query, [email]);
+
+  return result.rows[0];
+
+};
+
+
 module.exports = {
   getCandidates,
-  getCvFilePathByCandidateId,
-  deleteCandidateById 
+  deleteCandidateById,
+  findCandidateByEmail
 };
