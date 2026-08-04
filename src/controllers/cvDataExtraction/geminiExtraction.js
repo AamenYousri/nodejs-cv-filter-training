@@ -56,6 +56,10 @@ async function extractWithGemini(text) {
             logger.info("Gemini extraction succeeded.", {
                 name: parsed.name,
                 email: parsed.email,
+                city: parsed.city,
+                jobTitle: parsed.jobTitle,
+                yearsOfExperience: parsed.yearsOfExperience,
+                skills: parsed.skills,
                 attempt,
             });
 

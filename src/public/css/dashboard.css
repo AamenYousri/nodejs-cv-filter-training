@@ -26,10 +26,12 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.4);
+    background: rgba(15, 23, 42, .56);
+    padding: 20px;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1100;
+    backdrop-filter: blur(4px);
 }
 
 .modal.show {
@@ -37,10 +39,12 @@ body {
 }
 
 .modal-content {
-    width: 300px;
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
+    width: min(100%, 520px);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, .28);
+    animation: upload-modal-enter .2s ease-out;
 }
 
 .modal-header {
@@ -49,18 +53,54 @@ body {
     align-items: center;
 }
 
-.modal-header button {
+.modal-eyebrow { color: #64748b; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.modal-header h2 { margin: 4px 0 0; color: #0f172a; font-size: 1.35rem; }
+.modal-close {
+    width: 36px;
+    height: 36px;
     border: none;
-    background: none;
-    font-size: 24px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 26px;
+    line-height: 1;
     cursor: pointer;
+    transition: .2s ease;
 }
+.modal-close:hover { background: #e2e8f0; color: #0f172a; }
 
-#selectedFiles {
-    margin: 15px 0;
-}
+.upload-description { margin: 18px 0; color: #64748b; font-size: .9rem; line-height: 1.5; }
+.file-dropzone { display: flex; min-height: 150px; padding: 22px; border: 2px dashed #94a3b8; border-radius: 14px; background: #f8fafc; color: #475569; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; text-align: center; transition: .2s ease; }
+.file-dropzone:hover, .file-dropzone:focus-within { border-color: #2563eb; background: #eff6ff; }
+.file-dropzone i { color: #2563eb; font-size: 2rem; margin-bottom: 10px; }
+.file-dropzone-title { color: #1e293b; font-weight: 700; }
+.file-dropzone-hint { margin-top: 4px; font-size: .8rem; }
+.file-dropzone input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.selected-files { display: grid; gap: 8px; margin: 14px 0 0; max-height: 142px; overflow-y: auto; }
+.file-item { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 9px; color: #334155; font-size: .86rem; background: #fff; overflow-wrap: anywhere; }
+.file-item::before { content: "\f15c"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #2563eb; }
+.upload-status { min-height: 20px; margin: 12px 0 0; color: #64748b; font-size: .82rem; }
+.upload-status.error { color: #b91c1c; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.upload-cancel, .upload-submit { border: 0; border-radius: 9px; padding: 10px 16px; font-weight: 700; cursor: pointer; transition: .2s ease; }
+.upload-cancel { background: #f1f5f9; color: #334155; }
+.upload-cancel:hover { background: #e2e8f0; }
+.upload-submit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 130px; background: #2563eb; color: #fff; }
+.upload-submit:hover:not(:disabled) { background: #1d4ed8; }
+.upload-submit:disabled, .upload-cancel:disabled, .modal-close:disabled { cursor: not-allowed; opacity: .65; }
+.upload-spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.42); border-top-color: #fff; border-radius: 50%; animation: upload-spin .7s linear infinite; }
+.upload-submit.is-loading .upload-spinner { display: block; }
+@keyframes upload-spin { to { transform: rotate(360deg); } }
+@keyframes upload-modal-enter { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
 
-.file-item {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
+@media (max-width: 768px) {
+    .main-content-container {
+        margin-left: 0;
+        padding: 0px;
+    }
+
+    .modal { padding: 12px; }
+    .modal-content { padding: 20px; }
+    .modal-actions { flex-direction: column-reverse; }
+    .upload-cancel, .upload-submit { width: 100%; }
 }
