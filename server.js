@@ -118,18 +118,13 @@ app.use(express.static(path.join(__dirname, 'src', 'public')));
 app.use(cors());
 
 // API routes
-app.use("/api/cvs", require("./src/routes/cvRoutes"));
-app.use("/api/auth", require("./src/routes/authRoutes"));
-app.use("/api/skills", require("./src/routes/skillRoutes"));
-
 const cvRoutes = require("./src/routes/cvRoutes");
-
-// ==========================================
-// CV Routes
-// ==========================================
-
+app.use("/api/auth", authRoutes);
+app.use("/api/skills", require("./src/routes/skillRoutes"));
 app.use("/api/cv", cvRoutes);
+app.use("/api/cvs", cvRoutes);
 app.use("/api/candidates", require("./src/routes/candidateRoutes"));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Frontend routes
 app.get('/login', (req, res) => {
@@ -171,18 +166,6 @@ app.get('/forgot-password', (req, res) => {
     return res.redirect('/dashboard');
   }
 
-app.use("/api/candidates", require("./src/routes/candidateRoutes"));
-
-// Frontend routes
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'login.html'));
-});
-
-app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'public', 'html','register.html'));
-});
-
-app.get('/forgot-password', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'forget-password.html'));
 });
 
@@ -211,22 +194,10 @@ app.get('/dashboard', (req, res) => {
     return res.redirect('/otp-verification');
   }
 
-  res.sendFile(path.join(__dirname, 'src', 'public', 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'src', 'public', 'html', 'dashboard.html'));
 });
 
 
-
-app.use("/api/uploads", express.static("uploads"));
-
-const cvRoutes = require("./src/routes/cvRoutes");
-
-// ==========================================
-// CV Routes
-// ==========================================
-
-app.use("/api/cv", cvRoutes);
-
-app.use("/api/candidates", require("./src/routes/candidateRoutes"))
 
 // Serve the UI for any other route
 app.get('/{*path}', (req, res) => {
@@ -245,4 +216,3 @@ app.get('/{*path}', (req, res) => {
 
 
 module.exports = app;
-});

@@ -16,7 +16,7 @@ const emailHtml = (user) => `
   <div>
     <h2 style="font-size: 24px; color: #000; text-align:center;">Welcome, ${user.name}!</h2>
     <p style="font-size: 16px; color: #000; text-align:center;">Your OTP code is: <strong>${user.otp_code}</strong></p>
-    <p style="font-size: 16px; color: #363535; text-align:center;">This code will expire in 10 minutes.</p>
+    <p style="font-size: 16px; color: #363535; text-align:center;">This code will expire in 5 minutes.</p>
   </div>
 `;
 

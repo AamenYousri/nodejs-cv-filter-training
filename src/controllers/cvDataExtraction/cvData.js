@@ -4,14 +4,10 @@ const extractSkills = require("./skillsExtraction");
 const extractCity = require("./extractCity");
 const { extractYearsExperience, extractExperienceSection } = require("./extractExperienceSection");
 const { parseCv, splitLines } = require("./parsingText");
+const { extractWithGemini } = require("./geminiExtraction");
+const logger = require("../../utils/logger");
 
-async function extractCvData(filepath) {
-
-    const text = await parseCv(filepath);
-    const lines = splitLines(text);
-
-    console.log(text);
-
+function extractWithRegex(text, lines) {
     return {
         name: extractName(lines),
         email: extractEmail(text),
@@ -20,6 +16,19 @@ async function extractCvData(filepath) {
         yearsOfExperience: extractYearsExperience(text),
         skills: extractSkills(text)
     };
+}
+
+async function extractCvData(filepath) {
+
+    const text = await parseCv(filepath);
+    const lines = splitLines(text);
+
+    try {
+        return await extractWithGemini(text);
+    } catch (error) {
+        logger.error("Gemini extraction failed, falling back to regex extraction.", { error: error.message });
+        return extractWithRegex(text, lines);
+    }
 }
 
 module.exports = extractCvData;
