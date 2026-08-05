@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageEl = document.getElementById('login-msg');
   const rememberButton = document.getElementById('remember');
 
+  const loggedOut = new URLSearchParams(window.location.search).get('loggedOut');
+  if (loggedOut === '1') {
+    showMessage('You have logged out successfully.', 'success');
+    window.history.replaceState({}, document.title, '/login');
+  }
+
   if (togglePasswordBtn && passwordInput) {
     togglePasswordBtn.addEventListener('click', () => {
       const isPasswordVisible = passwordInput.type === 'text';
