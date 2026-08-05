@@ -170,3 +170,21 @@
 .dashboard-candidate-table thead th.sorted i {
     color: #2563eb;
 }
+/* Library action feedback */
+.library-message {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.library-message.success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.library-message.error {
+  color: #b91c1c;
+  background: #fee2e2;
+}

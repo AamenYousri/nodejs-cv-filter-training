@@ -78,7 +78,6 @@
         <td>${escapeHtml(c.title)}</td>
         <td>${escapeHtml(c.experience)}</td>
         <td>${escapeHtml(c.city)}</td>
-        <td><span class="badge match ${matchClass(c.match)}">${c.match ? c.match + "% Match" : "N/A"}</span></td>
         <td><span class="badge ${statusClass(c.status)}">${escapeHtml(c.status)}</span></td>
         <td class="actions"></td>
       `;
@@ -254,6 +253,17 @@
 
         displayedCandidates = [...candidates];
 
+        const candidateSkills = candidates.flatMap((candidate) => {
+          if (Array.isArray(candidate.skills)) return candidate.skills;
+          return String(candidate.skills || "")
+            .replace(/^\{?(.+?)\}?$/, "$1")
+            .split(",")
+            .filter(Boolean);
+        });
+        window.dispatchEvent(new CustomEvent("candidates-loaded", {
+          detail: { skills: candidateSkills },
+        }));
+
         console.log(candidates)
 
         render(displayedCandidates);
@@ -313,11 +323,18 @@
 
         // Skills
         if (filters.skills.length) {
-            const candidateSkills = candidate.skills || [];
+            const candidateSkills = Array.isArray(candidate.skills)
+                ? candidate.skills
+                : String(candidate.skills || "")
+                    .replace(/^\{?(.+?)\}?$/, "$1")
+                    .split(",")
+                    .filter(Boolean);
+
+            const normalizeSkill = (skill) => String(skill).trim().toLowerCase();
 
             const hasAllSkills = filters.skills.every(skill =>
                 candidateSkills.some(s =>
-                    s.toLowerCase() === skill.toLowerCase()
+                    normalizeSkill(s) === normalizeSkill(skill)
                 )
             );
 
