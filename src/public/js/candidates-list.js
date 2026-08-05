@@ -254,6 +254,17 @@
 
         displayedCandidates = [...candidates];
 
+        const candidateSkills = candidates.flatMap((candidate) => {
+          if (Array.isArray(candidate.skills)) return candidate.skills;
+          return String(candidate.skills || "")
+            .replace(/^\{?(.+?)\}?$/, "$1")
+            .split(",")
+            .filter(Boolean);
+        });
+        window.dispatchEvent(new CustomEvent("candidates-loaded", {
+          detail: { skills: candidateSkills },
+        }));
+
         console.log(candidates)
 
         render(displayedCandidates);
@@ -313,11 +324,18 @@
 
         // Skills
         if (filters.skills.length) {
-            const candidateSkills = candidate.skills || [];
+            const candidateSkills = Array.isArray(candidate.skills)
+                ? candidate.skills
+                : String(candidate.skills || "")
+                    .replace(/^\{?(.+?)\}?$/, "$1")
+                    .split(",")
+                    .filter(Boolean);
+
+            const normalizeSkill = (skill) => String(skill).trim().toLowerCase();
 
             const hasAllSkills = filters.skills.every(skill =>
                 candidateSkills.some(s =>
-                    s.toLowerCase() === skill.toLowerCase()
+                    normalizeSkill(s) === normalizeSkill(skill)
                 )
             );
 
