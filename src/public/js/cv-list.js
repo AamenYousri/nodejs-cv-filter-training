@@ -6,6 +6,21 @@
 (function () {
   const tbody = document.getElementById('candidates-tbody');
 
+  function showLibraryMessage(text, type = 'success') {
+    let messageEl = document.getElementById('library-message');
+    if (!messageEl) {
+      messageEl = document.createElement('p');
+      messageEl.id = 'library-message';
+      messageEl.className = 'library-message';
+      messageEl.setAttribute('role', 'status');
+      messageEl.setAttribute('aria-live', 'polite');
+      tbody?.closest('.dashboard-candidate-table-container')?.prepend(messageEl);
+    }
+
+    messageEl.textContent = text;
+    messageEl.className = `library-message ${type}`;
+  }
+
   
   
 
@@ -46,20 +61,23 @@
 
   
   async function deleteCandidate(candidateId, status) {
+    const candidate = candidates.find((item) => item.id === candidateId);
+    const candidateName = candidate?.name || 'this candidate';
+
+    if (!window.confirm(`Are you sure you want to delete ${candidateName}? This action cannot be undone.`)) {
+      return;
+    }
+
     try {
       await deleteCand(candidateId, window.TokenStorage?.get(), status);
 
-      candidates = candidates.map((candidate) =>
-        candidate.id === candidateId ? { ...candidate, status } : candidate,
-      );
-      displayedCandidates = displayedCandidates.map((candidate) =>
-        candidate.id === candidateId ? { ...candidate, status } : candidate,
-      );
+      candidates = candidates.filter((candidate) => candidate.id !== candidateId);
+      displayedCandidates = displayedCandidates.filter((candidate) => candidate.id !== candidateId);
       render(displayedCandidates);
-
-      await loadCandidates();
+      showLibraryMessage(`${candidateName} was deleted successfully.`);
     } catch (error) {
       console.error("Unable to update candidate status:", error);
+      showLibraryMessage(error.message || 'Unable to delete this candidate. Please try again.', 'error');
     }
   }
 
