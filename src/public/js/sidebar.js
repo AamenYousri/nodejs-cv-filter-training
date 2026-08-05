@@ -168,8 +168,12 @@ class Sidebar {
 
     logoutBtn.addEventListener('click', (event) => {
       event.preventDefault();
+
+      const shouldLogout = window.confirm('Are you sure you want to log out?');
+      if (!shouldLogout) return;
+
       this.tokenStorage.clear();
-      window.location.href = '/login';
+      window.location.href = '/login?loggedOut=1';
     });
   }
 
