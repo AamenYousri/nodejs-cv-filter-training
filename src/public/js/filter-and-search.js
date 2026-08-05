@@ -8,6 +8,52 @@ const selectedFilters = {
 };
 
 const candidateSearch = document.getElementById("candidateSearch");
+let availableSkills = [];
+
+function renderSkillOptions(search = "") {
+  const skillsFilter = document.querySelector('.multi-filter[data-filter="skills"]');
+  const optionsList = skillsFilter?.querySelector(".options-list");
+  if (!skillsFilter || !optionsList) return;
+
+  const selected = selectedFilters.skills || [];
+  optionsList.innerHTML = "";
+
+  if (!availableSkills.length) {
+    optionsList.innerHTML = '<div class="no-results">No skills found</div>';
+    return;
+  }
+
+  const matchingSkills = availableSkills.filter((skill) =>
+    skill.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  if (!matchingSkills.length) {
+    optionsList.innerHTML = '<div class="no-results">No matching candidate skills</div>';
+    return;
+  }
+
+  matchingSkills.forEach((skill) => {
+    const option = document.createElement("div");
+    option.className = "option";
+    option.textContent = skill;
+    option.classList.toggle("selected", selected.some((item) => item.toLowerCase() === skill.toLowerCase()));
+    option.addEventListener("click", (event) => {
+      event.stopPropagation();
+      addValue("skills", skill, skillsFilter);
+      const search = skillsFilter.querySelector(".dropdown-search input");
+      if (search) search.value = "";
+    });
+    optionsList.appendChild(option);
+  });
+}
+
+function setAvailableSkills(skills) {
+  availableSkills = [...new Set((skills || [])
+    .map((skill) => String(skill).trim())
+    .filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
+  renderSkillOptions();
+}
 
 function getTableCellValueByFilter(filterName, row) {
   if (!row) return "";
@@ -48,7 +94,7 @@ function renderFilterOptionsFromRows() {
     if (!optionsList) return;
 
     if (filterName === "skills") {
-      optionsList.innerHTML = "";
+      renderSkillOptions();
       return;
     }
 
@@ -215,7 +261,10 @@ filters.forEach((filter) => {
 
     if (!value) return;
 
-    addValue(filterName, value, filter);
+    const matchingSkill = availableSkills.find(
+      (skill) => skill.toLowerCase() === value.toLowerCase(),
+    );
+    if (matchingSkill) addValue(filterName, matchingSkill, filter);
 
     mainInput.value = "";
   });
@@ -238,11 +287,15 @@ filters.forEach((filter) => {
 
   dropdownSearch.addEventListener("input", function () {
     const searchValue = this.value.toLowerCase().trim();
+    if (filterName === "skills") {
+      renderSkillOptions(searchValue);
+      return;
+    }
     filterOptions(filter, searchValue);
   });
 
   if (filterName === "skills") {
-    optionsList.innerHTML = "";
+    optionsList.innerHTML = '<div class="no-results">Loading skills...</div>';
   }
 });
 
@@ -330,6 +383,10 @@ if (candidateSearch) {
     console.log("Candidate Search:", this.value.trim());
   });
 }
+
+window.addEventListener("candidates-loaded", (event) => {
+  setAvailableSkills(event.detail?.skills);
+});
 
 renderFilterOptionsFromRows();
 window.renderFilterOptionsFromRows = renderFilterOptionsFromRows;
