@@ -1,3 +1,5 @@
+/* Requires theme-variables.css to be linked before this file */
+
 /* Reset & Base Styles */
 * {
   box-sizing: border-box;
@@ -6,43 +8,74 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: url("../images/generated-image (7).png") no-repeat center center / cover;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: url("../images/New_Background.png") no-repeat center center /
+    cover;
   background-attachment: fixed;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-right: 10%;
   align-items: center;
   min-height: 100vh;
-  color: #333;
+  color: var(--text-dark);
+}
+
+body::before {
+  content: "";
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(20, 10, 45, 0.05);
+
+  pointer-events: none;
 }
 
 /* Card Container */
+/* No background here on purpose: .card-header needs the real page image
+   showing through it. If .login-card were white, the header's
+   translucent gradient would composite over that white instead of the
+   photo — which is exactly why it looked washed-out gray before. The
+   solid white now lives on .card-body only (below). */
 .login-card {
   width: 100%;
-  max-width: 380px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.22);
   overflow: hidden;
+  position: relative;
+  z-index: 2;
+  margin-left: auto;
+  margin-right: 7%;
 }
 
 /* Header Container */
+/* Dark-tinted glass instead of white-tinted: the background photo has a
+   lot of saturated neon colors (orange/red/cyan/teal) that all showed
+   through equally with a white tint, which read as busy/competing. A
+   brand-dark tint unifies them into one calm purple wash while still
+   keeping shapes/blur of the photo visible underneath. */
 .card-header {
-  background-color: #121c2d;
-  padding: 18px 20px;
+  background: rgba(21, 1, 71, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 18px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
   position: relative;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .back-button {
   position: absolute;
   left: 18px;
   top: 18px;
-  color: #ffffff;
+  color: var(--bg-white);
   text-decoration: none;
   font-size: 1rem;
   display: inline-flex;
@@ -50,7 +83,7 @@ body {
   justify-content: center;
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
   transition: background-color 0.2s ease;
 }
@@ -69,63 +102,67 @@ body {
 
 /* All For One Logo Image */
 .brand-logo {
-  max-width: 180px;
+  max-width: 210px;
   height: auto;
   max-height: 45px;
   object-fit: contain;
   filter: brightness(0) invert(1); /* Turns dark text/logo white to fit dark header background */
 }
 
-/* Subtitle */
-.brand-sub {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #8ab4f8;
-}
 .header-text {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* NOTE: .brand-sub was previously declared twice (second rule silently
+   overrode the first). Merged into a single rule below.
+   Both use white + a soft text-shadow: on a translucent glass header the
+   backdrop is a photo, not a flat color, so a colored text (e.g. cyan)
+   can lose contrast over the image's lighter areas. White + shadow reads
+   reliably no matter what part of the image sits behind it. */
 .brand-title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #8ab4f8;
+  color: var(--bg-white);
   letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 .brand-sub {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 1px;
-  color: #ffffff;
+  color: var(--bg-white);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 /* Card Body */
 .card-body {
-  padding: 24px 28px;
+  background: var(--bg-white);
+  padding: 30px 36px 30px 36px;
   text-align: center;
+  border-top: 1px solid #f5f5f5;
 }
 
 .title {
-  font-size: medium;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 15px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-dark);
 }
 
 .subtitle {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-bottom: 20px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  color: var(--text-muted);
 }
 
 /* Inputs */
 .input-group {
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .input-icon {
@@ -133,8 +170,12 @@ body {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--text-light-muted);
   font-size: 0.85rem;
+}
+
+.input-group:focus-within .input-icon {
+  color: var(--brand-dark);
 }
 
 .toggle-password {
@@ -142,26 +183,28 @@ body {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--text-light-muted);
   font-size: 0.85rem;
   cursor: pointer;
 }
 
 .input-group input {
   width: 100%;
-  padding: 10px 36px 10px 34px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  background-color: #f8fafc;
+  height: 52px;
+  border: 1px solid var(--border-mid);
+  padding: 0 40px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background-color: var(--bg-page);
   outline: none;
   transition: all 0.2s ease;
   margin-top: 6px;
 }
 
 .input-group input:focus {
-  border-color: #1e293b;
-  background-color: #ffffff;
+  border-color: var(--accent-orange);
+  background-color: var(--bg-white);
+  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.15);
 }
 
 /* Options (Remember Me / Forgot Password) */
@@ -169,25 +212,26 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
-  margin-bottom: 16px;
+  font-size: 0.82rem;
+  margin-top: 6px;
+  margin-bottom: 22px;
 }
 
 .remember-me {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #1e293b;
+  color: var(--text-dark);
   font-weight: 500;
   cursor: pointer;
 }
 
 .remember-me input {
-  accent-color: #1e293b;
+  accent-color: var(--accent-orange);
 }
 
 .forgot-link {
-  color: #1e293b;
+  color: var(--accent-orange);
   text-decoration: none;
   font-weight: 600;
 }
@@ -199,19 +243,22 @@ body {
 /* Buttons */
 .btn-primary {
   width: 100%;
-  padding: 10px;
-  background-color: #192638;
-  color: #ffffff;
+  height: 50px;
+  background: #2b0a5a;
+  border-radius: 10px;
+  transition: 0.3s;
+  color: var(--bg-white);
   border: none;
-  border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #0f172a;
+  background: #3a0f78;
+
+  transform: translateY(-2px);
 }
 
 /* Social Buttons */
@@ -223,12 +270,13 @@ body {
 
 /* Footer Link */
 .signup-text {
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: 0.82rem;
+  margin-top: 14px;
+  color: var(--text-muted);
 }
 
 .signup-text a {
-  color: #2563eb;
+  color: var(--accent-orange);
   text-decoration: none;
   font-weight: 600;
 }
@@ -246,13 +294,30 @@ body {
 }
 
 .msg.error {
-  color: #dc2626;
+  color: var(--accent-red);
 }
 
 .msg.success {
-  color: #15803d;
+  color: var(--accent-teal-dark);
 }
 
 .hidden {
   display: none !important;
+}
+
+.login-card {
+  animation: fadeUp 0.45s ease;
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: none;
+  }
 }

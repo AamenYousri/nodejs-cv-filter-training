@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>CV Library</title>
+    <link rel="stylesheet" href="/css/theme-variables.css">
+
+    <!-- Font Awesome -->
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="filter-and-search.css" />
+  </head>
+
+  <body>
+    <div class="filter-section">
+      <!-- =================================
+         HEADER
+    ================================== -->
+
+      <div class="filter-header">
+        <!-- Filter Title -->
+
+        <div class="filter-title">
+          <span>Filter</span>
+
+          <i class="fa-solid fa-filter"></i>
+        </div>
+
+        <!-- Search Candidates -->
+
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input
+            type="text"
+            id="candidateSearch"
+            placeholder="Search CV's..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <!-- =================================
+         FILTERS
+    ================================== -->
+      <div class="filters-container">
+        <!-- =================================
+             EXPERIENCE
+        ================================== -->
+
+        <div class="multi-filter" data-filter="experience">
+          <div class="filter-input">
+            <i class="fa-regular fa-clock filter-icon"></i>
+
+            <!-- Selected Values -->
+
+            <div class="selected-items"></div>
+
+            <!-- Write Custom Value -->
+
+            <input
+              type="date"
+              class="multi-input"
+              placeholder="Date"
+              autocomplete="off"
+            />
+
+            <i class="fa-solid fa-chevron-down arrow"></i>
+          </div>
+
+          <!-- Date Search -->
+
+          <div class="dropdown">
+            <!-- Dropdown Search -->
+
+            <div class="dropdown-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                placeholder="Search Date"
+                autocomplete="off"
+              />
+            </div>
+
+            <!-- Experience List -->
+
+            <div class="options-list">
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================
+             STATUS
+        ================================== -->
+
+        <div class="multi-filter" data-filter="skills">
+          <div class="filter-input">
+            <i class="fa-solid fa-code filter-icon"></i>
+
+            <!-- Selected Values -->
+
+            <div class="selected-items"></div>
+
+            <!-- Write Custom Value -->
+
+            <input
+              type="text"
+              class="multi-input"
+              placeholder="Status"
+              autocomplete="off"
+            />
+
+            <i class="fa-solid fa-chevron-down arrow"></i>
+          </div>
+
+          <!-- Skills Dropdown -->
+
+          <div class="dropdown">
+            <!-- Dropdown Search -->
+            <div class="options-list">
+              <div class="option">Accepted</div>
+
+              <div class="option">Review</div>
+
+              <div class="option">Rejected</div>
+
+              <div class="option">Done</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================
+         BUTTONS
+    ================================== -->
+
+      <div class="filter-actions">
+        <!-- Filter Button -->
+
+        <button type="button" id="applyFilterBtn" class="apply-filter-btn">
+          <i class="fa-solid fa-filter"></i>
+
+          Filter
+        </button>
+
+        <!-- Clear Button -->
+
+        <button type="button" id="clearFilterBtn" class="clear-filter-btn">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+
+    <script src="filter-and-search.js"></script>
+  </body>
+</html>

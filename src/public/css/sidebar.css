@@ -1,3 +1,5 @@
+/* Requires theme-variables.css to be linked before this file */
+
 body {
   margin: 0;
   padding: 0;
@@ -5,9 +7,10 @@ body {
 }
 
 :root {
-  --sidebar-accent: #121c2d;
-  --sidebar-accent-light: #e8edff;
-  --sidebar-width: 260px;
+  /* Points to the shared theme — kept here so existing markup
+     referencing --sidebar-accent / --sidebar-accent-light keeps working */
+  --sidebar-accent: var(--brand-dark);
+  --sidebar-accent-light: var(--accent-lavender-soft);
 }
 
 .sidebar {
@@ -20,6 +23,7 @@ body {
   font-family: "Inter", sans-serif;
   gap: 30px;
 }
+
 #desktop-sidebar {
   position: fixed;
   top: 0;
@@ -27,6 +31,7 @@ body {
   z-index: 1050;
   width: 1px;
 }
+
 .sidebar-logo {
   display: flex;
   flex-direction: column;
@@ -44,7 +49,7 @@ body {
 .brand-sub {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #8ab4f8;
+  color: var(--accent-cyan);
   letter-spacing: 0.5px;
   margin-top: 5px;
 }
@@ -63,23 +68,23 @@ body {
   gap: 10px;
   padding: 12px 14px;
   border-radius: 16px;
-  color: #ffffff;
+  color: var(--bg-white);
   text-decoration: none;
   font-size: 14px;
   transition: background 0.2s;
-  
 }
+
 .menu-item span {
-  color: #ffffff;
+  color: var(--bg-white);
 }
 
 .menu-item i {
-  color: #ffffff;
+  color: var(--bg-white);
 }
 
 .menu-item:hover {
-  background: rgba(232, 237, 255, 0.12);
-  color: #ffffff;
+  background: rgba(30, 195, 240, 0.14);
+  color: var(--bg-white);
 }
 
 .menu-item.active {
@@ -99,17 +104,17 @@ body {
   gap: 10px;
   padding: 16px 20px 0;
   margin: 0 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.575);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .user-avatar {
   font-size: 28px;
-  color: #ffffff;
+  color: var(--bg-white);
 }
 
 .user-name {
   font-size: 14px;
-  color: #ffffff;
+  color: var(--bg-white);
 }
 
 /* Hamburger Button */
@@ -125,16 +130,15 @@ body {
   justify-content: center;
   border: none;
   border-radius: 12px;
-  background-color: #121c2d !important;
-  color: #fff !important;
+  background-color: var(--brand-dark) !important;
+  color: var(--bg-white) !important;
   transition: all 0.3s ease;
 }
 
 .sidebar-toggle.open {
-  background-color: #fff !important;
-  color: #121c2d !important;
+  background-color: var(--bg-white) !important;
+  color: var(--brand-dark) !important;
 }
-
 
 @media (max-width: 991px) {
   .sidebar-toggle {
@@ -147,7 +151,7 @@ body {
 }
 
 .offcanvas .sidebar-logo {
-    padding-top: 70px;
+  padding-top: 70px;
 }
 
 .offcanvas {
@@ -160,26 +164,26 @@ body {
 }
 
 .logout-btn {
-  color: #ff6b6b;
+  color: var(--accent-red);
   transition: 0.3s ease;
 }
 
 .logout-btn i,
 .logout-btn span {
-  color: #ff6b6b;
+  color: var(--accent-red);
 }
 
 .logout-btn.active {
-  background: rgba(255, 107, 107, 0.12);
-  color: #ff6b6b;
+  background: rgba(240, 60, 80, 0.12);
+  color: var(--accent-red);
 }
 
 .logout-btn:hover {
-  color: #ff8787;
-  background: rgba(255, 107, 107, 0.12);
+  color: var(--accent-red-light);
+  background: rgba(240, 60, 80, 0.12);
 }
 
 .logout-btn:hover i,
 .logout-btn:hover span {
-  color: #ff8787;
+  color: var(--accent-red-light);
 }
