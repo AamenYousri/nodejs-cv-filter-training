@@ -1,0 +1,47 @@
+:root {
+  /* Brand dark surfaces (sidebar, headers, primary buttons) */
+  --brand-dark: #150147;
+  --brand-darker: #0f0139;
+  --brand-dark-hover: #1c005d;
+
+  /* Primary accent — orange */
+  --accent-orange: #f05014;
+  --accent-orange-light: #f06428;
+  --accent-orange-soft: #fde8df;
+
+  /* Secondary accent — cyan */
+  --accent-cyan: #1ec3f0;
+  --accent-cyan-soft: #e0f7fd;
+
+  /* Success accent — teal */
+  --accent-teal: #2de1c3;
+  --accent-teal-dark: #0f7896;
+  --accent-teal-soft: #d7fbf3;
+
+  /* Danger accent — red/pink */
+  --accent-red: #f03c50;
+  --accent-red-dark: #99231b;
+  --accent-red-light: #ff7a8a;
+  --accent-red-soft: #fde3e6;
+
+  /* Warning accent — amber */
+  --accent-amber: #ffb020;
+  --accent-amber-dark: #92400e;
+  --accent-amber-soft: #fff3d9;
+
+  /* Purple family */
+  --accent-purple: #39058d;
+  --accent-lavender: #9d83d3;
+  --accent-lavender-soft: #ece7fb;
+
+  /* Neutrals */
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --text-light-muted: #94a3b8;
+  --border-light: #e2e8f0;
+  --border-mid: #cbd5e1;
+  --bg-page: #f8fafc;
+  --bg-white: #ffffff;
+
+  --sidebar-width: 260px;
+}
