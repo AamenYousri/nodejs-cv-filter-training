@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const title = document.getElementById('form-title');
   const subtitle = document.getElementById('form-subtitle');
   const message = document.getElementById('login-msg');
+  let resetEmail = '';
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setResetStep(email) {
-    sessionStorage.setItem('passwordResetEmail', email);
+    resetEmail = email;
     emailInput.value = email;
     emailInput.readOnly = true;
     resetFields.classList.remove('hidden');
@@ -29,9 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     subtitle.textContent = `Enter the code sent to ${email} and choose a new password.`;
     resetCodeInput.focus();
   }
-
-  const savedEmail = sessionStorage.getItem('passwordResetEmail');
-  if (savedEmail) setResetStep(savedEmail);
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -68,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   resetPasswordButton.addEventListener('click', async () => {
-    const email = sessionStorage.getItem('passwordResetEmail');
+    const email = resetEmail;
     const resetCode = resetCodeInput.value.trim();
     const newPassword = newPasswordInput.value;
     const confirmPassword = confirmPasswordInput.value;
@@ -103,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      sessionStorage.removeItem('passwordResetEmail');
       showMessage('Password reset successfully. Redirecting to login...', 'success');
       setTimeout(() => { window.location.href = '/login'; }, 1200);
     } catch (error) {
